@@ -19,8 +19,6 @@ const userSchema = new Schema({
     password: { type: String, required: true }
 });
 
-const User = mongoose.model("User", userSchema);
-
 const threadSchema = new Schema({
     userId: Number,
     redditUrl: { type: String, required: true },
@@ -45,8 +43,6 @@ const threadSchema = new Schema({
     createdAt: Date
 });
 
-const Thread = mongoose.model("Thread", threadSchema);
-
 const commentSchema = new Schema({
     threadId: Number,
     commentId: String,
@@ -57,6 +53,8 @@ const commentSchema = new Schema({
     createdAt: Date
 });
 
-const Comment = mongoose.model("Comment", commentSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
+const Thread = mongoose.models.Thread || mongoose.model("Thread", threadSchema);
+const Comment = mongoose.models.Comment || mongoose.model("Comment", commentSchema);
 
 export const ReddinsightsSchema = { User, Thread, Comment }

@@ -1,20 +1,35 @@
 import { ReddinsightsSchema } from '@/lib/models';
 
 export async function POST (request: Request) {
-    const body = await request.json();
-    console.log('Parsed request body:', body);
+    try {
+        // parse the req body
+        const body = await request.json();
+        const { email } = body;
 
-    const email = body.email.toLowerCase();
+        // query database
+        const user = await ReddinsightsSchema.User.findOne({ email });
 
-    const user = await ReddinsightsSchema.User.findOne({ email });
-    console.log('Testing login route.ts, user found:', user);
+        // error handling if user does not exist
+        if (!user) {
+            return new Response(JSON.stringify({
+                success: false,
+                message: "User not found.",
+            }), { status: 404, })
+        }
 
-    return new Response(JSON.stringify({
-        success: true,
-        message: user ? "User found" : "User not found",
-        data: user,
-    }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-    });
+        // additional login logic --- checking password (see web dev simplified / scrypt, similar to compare with bcrypt, and the /utils folder)
+        // also starting a new session, etc.
+
+        return new Response(JSON.stringify({
+            success: true,
+            message: "Login successful.",
+            data: user,
+        }), { status: 200 });
+
+    } catch {
+        return new Response(JSON.stringify({
+            success: false,
+            message: "Something went wrong."
+        }), { status: 500 })
+    }
 }

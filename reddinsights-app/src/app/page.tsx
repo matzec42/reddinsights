@@ -1,4 +1,4 @@
-import Login from "./components/login/page"
+import Login from "./login/page"
 import Link from "next/link"
 
 // login page, direct to signup
@@ -14,7 +14,7 @@ export default function Home() {
                 <hr className="flex-grow border-t border-gray-300" />
       </div>
       <Link className="font-bold text-gray-700 hover:underline hover:text-blue-500 transition-colors duration-200"
-            href="/components/signup">Create a new account
+            href="/signup">Create a new account
       </Link>
     </div>
   );
