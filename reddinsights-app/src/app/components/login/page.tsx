@@ -16,6 +16,7 @@ const Login: React.FunctionComponent = () => {
         });
 
         const result = await response.json();
+        // console.log('Result of fetch from /api/auth/login:', result)
         setMessage(result.message);
 
         if (response.status === 200 || response.status === 201) {
