@@ -1,4 +1,4 @@
-import User from '@/lib/db';
+import { ReddinsightsSchema } from '@/lib/models';
 
 export async function POST (request: Request) {
     const body = await request.json();
@@ -6,7 +6,7 @@ export async function POST (request: Request) {
 
     const email = body.email.toLowerCase();
 
-    const user = await User.findOne({ email });
+    const user = await ReddinsightsSchema.User.findOne({ email });
     console.log('Testing login route.ts, user found:', user);
 
     return new Response(JSON.stringify({
