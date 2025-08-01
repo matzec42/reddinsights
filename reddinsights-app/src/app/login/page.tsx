@@ -1,13 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import AuthForm  from "../AuthForm"
+import AuthForm  from "../components/AuthForm"
+import { useRouter } from "next/navigation";
 
 const Login: React.FunctionComponent = () => {
+    const router = useRouter();
+
     // state --- login message, status
     const [message, setMessage] = useState("");
     const [isSuccessful, setIsSuccessful] = useState(false);
     
+    // login handler function, makes POST request to login route
     const handleLogin = async (data: { email: string, password: string }) => {
         const response = await fetch("/api/auth/login", {
             method: "POST",
@@ -16,13 +20,11 @@ const Login: React.FunctionComponent = () => {
         });
 
         const result = await response.json();
-        // console.log('Result of fetch from /api/auth/login:', result)
         setMessage(result.message);
 
-        if (response.status === 200 || response.status === 201) {
+        if (result.data) {
             setIsSuccessful(true);
-            // logic to redirect and/or store session token
-
+            router.push("/dashboard");
         } else {
             setIsSuccessful(false);
         }

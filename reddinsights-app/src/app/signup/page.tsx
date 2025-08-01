@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react";
-import AuthForm  from "../AuthForm"
+import AuthForm  from "../components/AuthForm"
 import Link from "next/link";
 
 const Signup: React.FunctionComponent = () => {
@@ -20,7 +20,7 @@ const Signup: React.FunctionComponent = () => {
         const result = await response.json();
         setMessage(result.message);
 
-        if (response.status === 200 || response.status === 201) {
+        if (result.data) {
             setIsSuccessful(true);
             setIsSuccess(true);
         } else {
@@ -33,7 +33,7 @@ const Signup: React.FunctionComponent = () => {
             <div>
                 { isSuccessful ? (
                     <>
-                        <p className="text-green-500 text-center text-lg font-semibold">
+                        <p className="text-gray-700 text-center text-lg font-semibold">
                             Welcome!
                         </p>
                     </>
@@ -52,10 +52,9 @@ const Signup: React.FunctionComponent = () => {
                 )}
 
                 {isSuccessful && (
-                    <Link href="../components/login">
-                        <a className="font-bold hover:underline text-gray-700 hover:text-blue-500 transition-colors duration-200">
-                            Back to login
-                        </a>
+                    <Link href="/"
+                        className="font-bold hover:underline text-gray-700 hover:text-blue-500 transition-colors duration-200">
+                        Back to login
                     </Link>
                 )}
             </div>

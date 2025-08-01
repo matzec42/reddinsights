@@ -14,7 +14,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode, onSubmit, resetForm }) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    // for 
+    // for clearing form (after submit/if changes detected with form)
     useEffect(() => {
         if (resetForm) {
             setEmail("");
