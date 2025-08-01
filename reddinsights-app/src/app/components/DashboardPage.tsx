@@ -1,9 +1,12 @@
+"use client"
 
+import Navbar from "./Navbar"
 
 const DashboardPage: React.FunctionComponent = () => {
     return (
         <div>
-            Dashboard Page under construction
+            <Navbar />
+            Hello World - DashboardPage
         </div>
     )
 }
