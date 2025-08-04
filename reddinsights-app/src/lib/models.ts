@@ -9,8 +9,8 @@ if (!MONGODB_URI) {
 mongoose.connect(MONGODB_URI, {
     dbName: 'Reddinsights-Data'
 })
-.then(() => console.log("Connected to MongoDB"))
-.catch((err) => console.log(err));
+    .then(() => console.log("Connected to MongoDB"))
+    .catch((err) => console.log(err));
 
 const Schema = mongoose.Schema;
 
@@ -20,7 +20,7 @@ const userSchema = new Schema({
 });
 
 const threadSchema = new Schema({
-    userId: Number,
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
     redditUrl: { type: String, required: true },
     subreddit: String,
     postTitle: String,
@@ -44,7 +44,7 @@ const threadSchema = new Schema({
 });
 
 const commentSchema = new Schema({
-    threadId: Number,
+    threadId: { type: Schema.Types.ObjectId, ref: 'Thread', required: true },
     commentId: String,
     author: String,
     content: String,
@@ -53,8 +53,33 @@ const commentSchema = new Schema({
     createdAt: Date
 });
 
+const cardSchema = new Schema({
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    threadId: { type: Schema.Types.ObjectId, ref: 'Thread' },
+    displayName: String,
+    createdAt: { type: Date, default: Date.now },
+    // for cards --- some repetition of Thread, but idea is to have user access past analyses/snaphots of threads
+    snapshot: {
+        subreddit: String,
+        postTitle: String,
+        commentCount: Number,
+        sentimentSummary: {
+            positive: Number,
+            negative: Number,
+            neutral: Number
+        },
+        topThemes: [
+            { label: String, quote: String }
+        ],
+        pieChartData: [
+            { label: String, value: Number }
+        ]
+    }
+});
+
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 const Thread = mongoose.models.Thread || mongoose.model("Thread", threadSchema);
 const Comment = mongoose.models.Comment || mongoose.model("Comment", commentSchema);
+const Card = mongoose.models.Card || mongoose.model("Card", cardSchema);
 
-export const ReddinsightsSchema = { User, Thread, Comment }
+export const ReddinsightsSchema = { User, Thread, Comment, Card }

@@ -1,4 +1,4 @@
-import Login from "./login/page"
+import Login from "./(routes)/login/page"
 import Link from "next/link"
 
 // login page, direct to signup

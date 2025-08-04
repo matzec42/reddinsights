@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import Image from 'next/image';
+import Link from "next/link";
+import Image from "next/image";
 
 const Navbar: React.FunctionComponent = () => {
     return (
@@ -11,15 +11,17 @@ const Navbar: React.FunctionComponent = () => {
                     <Image
                         width={30}
                         height={30}
-                        alt={'Menu button'}
-                        src={'/menu.svg'}
+                        alt={"Menu button"}
+                        src={"/menu.svg"}
                     ></Image>
                 </Link>
             </div>
 
-            <h1 className="text-4xl font-bold mb-6 mt-4">Reddinsights</h1>
+            <Link href="/dashboard">
+                <h1 className="text-4xl font-bold mb-6 mt-4">Reddinsights</h1>
+            </Link>
 
-            <Link href="">
+            <Link href="/analyzer">
                 <button className="w-full py-2 m-3 rounded-md text-white font-bold bg-orange-600 hover:bg-orange-400 focus:outline-none focus:ring focus:ring-orange-250">
                     Start a New Analysis
                 </button>
@@ -31,7 +33,7 @@ const Navbar: React.FunctionComponent = () => {
                         width={30}
                         height={30}
                         alt={"Logout button"}
-                        src={'/logout.svg'}
+                        src={"/logout.svg"}
                     ></Image>
                 </Link>
             </div>
