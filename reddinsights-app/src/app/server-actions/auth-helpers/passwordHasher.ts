@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-// 
+// function to hash PW
 export function hashPassword(password: string, salt: string): Promise<string> {
     return new Promise((resolve, reject) => {
         crypto.scrypt(password.normalize(), salt, 64, (error, hash) => {

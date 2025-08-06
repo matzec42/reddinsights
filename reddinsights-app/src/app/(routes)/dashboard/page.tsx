@@ -1,4 +1,4 @@
-import DashboardPage from "../components/DashboardPage"
+import DashboardPage from "../../components/DashboardPage"
 
 const Dashboard: React.FunctionComponent = () => {
     return (
