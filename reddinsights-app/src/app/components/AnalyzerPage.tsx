@@ -9,32 +9,39 @@ const AnalyzerPage: React.FunctionComponent = () => {
         const formInput = e.currentTarget;
         const formInputData = new FormData(formInput);
         const searchTerm = formInputData.get("query") as string;
-        
+
         try {
-            const response = await fetch('/api/apiReddit', {
-                method: "POST",
-                // credentials: include,   // uncomment when sessions, cookies are set up
-                headers: { "Content-Type" : "application/json" },
-                body: JSON.stringify({ query: searchTerm })
-            })
-    
             // error handling --- missing search term, response not OK
-            if (!searchTerm) {
+            if (!searchTerm.trim()) {
+                console.error("Invalid search term")
                 alert("Please submit a term to search.");
                 return;
             }
-            if (!response.ok) throw new Error ("Something went wrong---unable to retrieve Insights.");
+            // fetch for RedditAPI
+            const response = await fetch('/api/apiReddit', {
+                method: "POST",
+                // credentials: include,   // uncomment when sessions, cookies are set up
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ query: searchTerm })
+            })
 
-            // parse the response
-            // const data = await response.json();
-            
-            // in the return, dynamically build Insight analysis card with response data
+            // error handling for bad response
+            if (!response.ok) throw new Error("Something went wrong---unable to retrieve Insights.");
+
+            // parse response from /api/apiReddit/route.ts
+            const fetchedThreads = await response.json();
+
+            return console.log(`AnalyzerPage component, after POST, parsed data: ${fetchedThreads}`);
+
+            // dynamically build Insight analysis card with response data
 
         } catch {
-
+            return new Response(JSON.stringify({
+                success: false,
+                message: "Something went wrong."
+            }), { status: 500 })
         }
     }
-    
 
     return (
         <div>
