@@ -1,4 +1,5 @@
 import { ReddinsightsSchema } from '@/lib/models';
+import { NextResponse } from 'next/server';
 
 export async function POST (request: Request) {
     try {
@@ -8,19 +9,19 @@ export async function POST (request: Request) {
 
         // error handling for missing credentials
         if (!email || !password) {
-            return new Response(JSON.stringify({
+            return NextResponse.json({
                 success: false,
                 message: "Failed to sign up."
-            }), { status: 400 })
+            }, { status: 400 })
         }
 
         // handling if user email already exists
         const existingUser = await ReddinsightsSchema.User.findOne({ email });
         if (existingUser) {
-            return new Response(JSON.stringify({
+            return NextResponse.json({
                 success: false,
                 message: "User already exists. Please login."
-            }), { status: 400 })
+            }, { status: 400 })
         }
 
         // password hashing --- see web dev simplified, skeleton code in /utils folders
@@ -28,16 +29,16 @@ export async function POST (request: Request) {
         // create new User in users document
         const newUser = ReddinsightsSchema.User.create({ email: email, password: password})
 
-        return new Response(JSON.stringify({
+        return NextResponse.json({
             success: true,
             message: "Signup successful.",
             data: newUser,
-        }), { status: 200 });
+        }, { status: 200 });
 
     } catch {
-        return new Response(JSON.stringify({
+        return NextResponse.json({
             success: false,
             message: "Something went wrong."
-        }), { status: 500 })
+        }, { status: 500 })
     }
 }

@@ -1,4 +1,5 @@
 import { ReddinsightsSchema } from '@/lib/models';
+import { NextResponse } from 'next/server';
 
 export async function POST (request: Request) {
     try {
@@ -11,25 +12,25 @@ export async function POST (request: Request) {
 
         // error handling if user does not exist
         if (!user) {
-            return new Response(JSON.stringify({
+            return NextResponse.json({
                 success: false,
                 message: "User not found.",
-            }), { status: 404, })
+            }, { status: 404, })
         }
 
         // additional login logic --- checking password (see web dev simplified / scrypt, similar to compare with bcrypt, and the /utils folder)
         // also starting a new session, etc.
 
-        return new Response(JSON.stringify({
+        return NextResponse.json({
             success: true,
             message: "Login successful.",
             data: user,
-        }), { status: 200 });
+        }, { status: 200 });
 
     } catch {
-        return new Response(JSON.stringify({
+        return NextResponse.json({
             success: false,
             message: "Something went wrong."
-        }), { status: 500 })
+        }, { status: 500 })
     }
 }
