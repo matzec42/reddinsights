@@ -29,22 +29,20 @@ const AnalyzerPage: React.FunctionComponent = () => {
             if (!response.ok) throw new Error("Something went wrong---unable to retrieve Insights.");
 
             // parse response from /api/apiReddit/route.ts
-            const fetchedThreads = await response.json();
+            const fetchedAnalysis = await response.json();
 
-            if (!fetchedThreads.data) {
-                console.error(`${fetchedThreads.message}`)
-                return alert(`${fetchedThreads.message}. Please try another Analysis with an existing Subreddit. Related Subreddits: ${fetchedThreads.suggestions}`)
+            if (!fetchedAnalysis.data) {
+                console.error(`${fetchedAnalysis.message}`)
+                return alert(`${fetchedAnalysis.message}. Please try another Analysis with an existing Subreddit.`)
             }
 
-            return console.log(`AnalyzerPage component, after POST, parsed data: ${fetchedThreads.data}`);
+            return console.log(`AnalyzerPage component, after POST, parsed data: ${fetchedAnalysis.data}`);
 
             // dynamically build Insight analysis card with response data
 
-        } catch {
-            return new Response(JSON.stringify({
-                success: false,
-                message: "Something went wrong."
-            }), { status: 500 })
+        } catch (err) {
+            console.error("Error fetching analysis", err);
+            alert("Something went wrong while trying to fetch insights. Please try again.");
         }
     }
 
@@ -55,18 +53,17 @@ const AnalyzerPage: React.FunctionComponent = () => {
                 <h1 className="font-bold m-2 text-2xl mt-4">Instructions:</h1>
                 <ul className="m-2 p-1 list-square list-inside">
                     <li>
-                        Enter the name of the Subreddit you want to get insights for. <br/>
-                        (in a Reddit URL, it is the text that comes after the /r/ --- e.g., McDonalds for http://www.reddit.com/r/McDonalds)
+                        Enter a Subreddit name (if you know it) or a search you want to get insights for (e.g., McDonalds for http://www.reddit.com/r/McDonalds, <br/>
+                        or a search like &quot;McDondalds value menu&quot;).
                     </li>
                     <li>
-                        Click the &quot;Analyze&quot; button.
+                        Click the Analyze button.
                     </li>
                     <li>
-                        Reddinsights will perform an AI-powered analysis of the Subreddit&apos;s hottest threads. <br/>
-                        (&quot;Hot&quot; threads are posts which are gaining in popularity with upvotes and comments.)
+                        Reddinsights will perform an AI-powered analysis of top Subreddit posts and replies. <br/>
                     </li>
                     <li>
-                        You can save the newly-created Reddinsight to your collection, or click on the &quot;Start a New Analysis&quot; in the navigation to start fresh.
+                        You can save the newly-created Reddinsight to your collection, or click on the &quot;Start a New Analysis&quot; in the navigation to start fresh with a new search.
                     </li>
                 </ul>
             </div>

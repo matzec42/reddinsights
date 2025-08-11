@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -7,7 +7,7 @@ if (!MONGODB_URI) {
 }
 
 mongoose.connect(MONGODB_URI, {
-    dbName: 'Reddinsights-Data'
+    dbName: "Reddinsights-Data"
 })
     .then(() => console.log("Connected to MongoDB"))
     .catch((err) => console.log(err));
@@ -20,7 +20,7 @@ const userSchema = new Schema({
 });
 
 const threadSchema = new Schema({
-    userId: { type: Schema.Types.ObjectId, ref: 'User' },
+    userId: { type: Schema.Types.ObjectId, ref: "User" },
     redditUrl: { type: String, required: true },
     subreddit: String,
     postTitle: String,
@@ -44,7 +44,7 @@ const threadSchema = new Schema({
 });
 
 const commentSchema = new Schema({
-    threadId: { type: Schema.Types.ObjectId, ref: 'Thread', required: true },
+    threadId: { type: Schema.Types.ObjectId, ref: "Thread", required: true },
     commentId: String,
     author: String,
     content: String,
@@ -54,8 +54,8 @@ const commentSchema = new Schema({
 });
 
 const cardSchema = new Schema({
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-    threadId: { type: Schema.Types.ObjectId, ref: 'Thread' },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    threadId: { type: Schema.Types.ObjectId, ref: "Thread" },
     displayName: String,
     createdAt: { type: Date, default: Date.now },
     // for cards --- some repetition of Thread, but idea is to have user access past analyses/snaphots of threads
