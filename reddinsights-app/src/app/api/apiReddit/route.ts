@@ -2,15 +2,9 @@
 // REVISED APPROACH / EXPERIMENT:
 // AI API call to ensure relevant Subreddits --> Reddit API query for replies (posts & their comments) --> second AI API call for analysis
 
-import { NextResponse } from 'next/server';
-import { Groq } from "groq-sdk";
-import { GroqApiCallOptions } from '@/types/groq-api-types/groq-types';
+import { NextResponse } from "next/server";
 import { groqCall } from '@/utils/groq-api-helpers';
-import snoowrap from 'snoowrap';
-import { ReddinsightsSchema } from '@/lib/models';
-
-// for querying Groq + Llama 3 (good for text-to-text)
-const groq = new Groq();
+import snoowrap from "snoowrap";
 
 // logic to query RedditAPI
 // using Snoowrap library as a wrapper to do this more cleanly
@@ -135,7 +129,7 @@ export async function POST(request: Request) {
 
         // last AI API call --- analysis of comments (sentiment, #'s of comments, themes & quotations in structured JSON)
         // check / repair format if not in JSON (remember to give it a shape of your Thread document)
-        const groqPromptTwo = `Here are is an array of comments from Reddit about ${cleanQuery}. Analyze and classify the sentiment of each comment (positive, negative or neutral) in this array: ${redditReplies}. Then, return a summary of your analysis that includes a short title for the analysis, the total number of comments analyzed, the overall sentiment of the comments (positive, negative, or mixed), and the top 3 themes (single word) each with a quote (partial or full comment) that is representative of that theme. Here is an example for the response:
+        const groqPromptTwo = `You are a helpful assistant that does customer sentiment analysis. Here are is an array of comments from Reddit about ${cleanQuery}. Analyze and classify the sentiment of each comment (positive, negative or neutral) in this array: ${redditReplies}. Then, return a summary of your analysis that includes a short title for the analysis, the total number of comments analyzed, the overall sentiment of the comments (positive, negative, or mixed), and the top 3 themes (single word) each with a quotation (a comment) that is representative of that theme. Here is an example for the response:
         { 
             analysisTitle: string (e.g., "Nordstrom Anniversary Sale Analysis"),
             commentCount: number (e.g., 20),
@@ -156,8 +150,6 @@ export async function POST(request: Request) {
             prompt: groqPromptTwo,
             systemPrompt: "You are a helpful assistant that does customer sentiment analysis and only returns information in JSON format."
         });
-
-        console.log("Returned analysis object from Groq API fetch:", analyzeReplies);
 
         try {
             console.log("Returned analysis object from Groq API fetch:", analyzeReplies);
