@@ -10,7 +10,7 @@ const groq = new Groq(
 // function to query Groq chat
 export async function groqCall({
         prompt,
-        model = "llama3-70b-8192",
+        model = "llama-3.3-70b-versatile",
         temperature = 0.2,
         maxTokens = 200,
         topP = 1,

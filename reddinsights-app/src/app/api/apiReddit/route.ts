@@ -37,9 +37,9 @@ export async function POST(request: Request) {
         const cleanQuery = query.trim().replace(/[^a-zA-Z0-9_-]/g, "");
 
         // first AI API call --- prompt with the query to fetch relevant Subreddits
-        const groqPromptOne = `Find 3 public Reddit communities that are most likely to contain detailed, first-hand user discussions and opinions directly about "${cleanQuery}". Prioritize communities where:
-            - The majority of posts are user-generated (not news or memes).
-            - Comments frequently contain personal experiences, reviews, or sentiment.
+        const groqPromptOne = `Find 5 public Reddit communities that are most likely to contain detailed, first-hand user discussions and opinions directly about "${cleanQuery}". Prioritize communities where:
+            - Most posts are user-generated (not news or memes).
+            - Posts focus mostly on customer reviews, experiences and sentiments.
             - The community is active (recent posts within the last month).
         If the query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901, etc.), make sure it gets included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid NSFW, off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"]`;
 
@@ -55,10 +55,12 @@ export async function POST(request: Request) {
             getSubreddits = JSON.parse(subredditList);
             console.log("Parsed subreddit list:", getSubreddits);
         } catch (err) {
-            console.error("Failed to parse Groq API response for subreddits:", subredditList);
+            console.error("Failed to parse Groq API response for subreddits:", subredditList, {
+                error: err,
+                raw: subredditList
+            });
             return NextResponse.json({
                 success: false,
-                error: "Groq response was not valid JSON:", err,
                 raw: subredditList
             }, { status: 500 });
         }
@@ -66,11 +68,15 @@ export async function POST(request: Request) {
         // edge case / error handling for empty array ... per the first prompt, it's possible it could be empty
 
         // query Reddit API ---  Snoowrap function (getTop w/ a time option) to fetch top or hot comments for threads
+
         // FUTURE WORK --- quality of fetched comments isn't always great / relevant...
-        // why?  --- for instance, why can't I get the posts that are on the front page of the /r/Nordstrom1901
+        // why?  --- for instance, why can't I get the posts that are on the front page of the /r/Nordstrom1901 (ANSWER: proprietary Reddit thing, regular joes don't get access to the latest & greatest...)
         // how to improve? ... right now, it's just grabbing post replies and throwing them into an array
-        // consider tracking/looking at subreddit URLs on fetched replies --> for second API query, prompt it to focus on most relevant and focus on customer sentiment only (not employees, ads, etc.). See Groq Docs --> Prompting Guide
-        // expandReplies() to a certain depth perhaps?  more expensive Reddit calls
+            // consider tracking/looking at subreddit URLs on fetched replies --> for second API query, prompt it to focus on most relevant and focus on customer sentiment only (not employees, ads, etc.). See Groq Docs --> Prompting Guide
+            // expandReplies() to a certain depth perhaps?  more expensive Reddit calls...
+            // also need to account for popular / hot topics, too many or too long of comment threads -> too many tokens for second Groq call of analysis (array is too large). Limit comments by string length?
+                // implement hueristics to 
+
         const fetchedReplies = async () => {
             const allReplies: Array<string> = [];
             for (const sub of getSubreddits) {
@@ -90,12 +96,12 @@ export async function POST(request: Request) {
                     if (postsArray) {
                         for (const post of postsArray) {
                             if (post.selftext && post.selftext.trim() !== "") {
-                                console.log(`Post from r/${sub}:`, post.title);
+                                // console.log(`Post from r/${sub}:`, post.title);
                                 allReplies.push(post.selftext);
                             }
                         }
-                        // this expandReplies method isn't working --- issue with the await line
-                        // write as separate function, call and push into array as well
+                        // NOTE: this expandReplies method isn't working --- issue with the await line
+                        // write as separate function, call and push into array as well (?)
                         // for (const post of postsArray) {
                         //     try {
                         //         await post.expandReplies({ depth: 1, limit: 5 });
@@ -122,17 +128,42 @@ export async function POST(request: Request) {
             return allReplies
         };
 
-        const redditReplies = await fetchedReplies();
+        // handling information density (structured compression)
+        const redditReplies = await fetchedReplies()
         console.log("Comments array:", redditReplies);
 
-        // error handling for empty erray --- consider early return + error, re-prompt user on frontend
+        const normalizedReplies = redditReplies.filter(r => typeof r === "string").map(r => r.trim()).filter(r => r.length > 20);
+        console.log("Normalized replies: ", normalizedReplies);
+
+        const MAX_COMMENTS = 40;
+        const cappedReplies = normalizedReplies.slice(0, MAX_COMMENTS);
+
+        const formattedReplies = cappedReplies.map((r, i) => `Comment ${i + 1}: ${r}`).join("\n\n---\n\n");
+        console.log(`Formatted replies: `, formattedReplies);
+
+
+        // error handling for empty erray --- consider early return + error, re-prompt user on frontend (?)
+
+        // TO-DO: manage/reduce token usage! --- the redditReplies array could be sanitized (e.g., slice )
 
         // last AI API call --- analysis of comments (sentiment, #'s of comments, themes & quotations in structured JSON)
         // check / repair format if not in JSON (remember to give it a shape of your Thread document)
-        const groqPromptTwo = `You are a helpful assistant that does customer sentiment analysis. Here are is an array of comments from Reddit about ${cleanQuery}. Analyze and classify the sentiment of each comment (positive, negative or neutral) in this array: ${redditReplies}. Then, return a summary of your analysis that includes a short title for the analysis, the total number of comments analyzed, the overall sentiment of the comments (positive, negative, or mixed), and the top 3 themes (single word) each with a quotation (a comment) that is representative of that theme. Here is an example for the response:
+        // FUTURE WORK: consider altering the analysis structure (see ideation Google doc). e.g., add a "trend" property (is sentiment going up/down/same)
+        const groqPromptTwo = `You are a helpful assistant that does customer sentiment analysis.
+        Here are is an array of replies from Reddit about ${cleanQuery}.
+        Analyze and classify the sentiment of each reply in this array: ${redditReplies}.
+        Then, return a summary of your analysis that includes:
+        - a short title for the analysis
+        - total number of comments analyzed
+        - a general summary of all comments analyzed
+        - classification ofoverall sentiment of the comments (positive, somewhat positive, neutral, somewhat negative, negative)
+        - top 3 themes (a short phrase), each with a quote (from a comment) that is representative of that theme.
+        
+        Here is an example for the response:
         { 
             analysisTitle: string (e.g., "Nordstrom Anniversary Sale Analysis"),
             commentCount: number (e.g., 20),
+            generalSummary: string (e.g., "Customers are generally excited about the Nordstrom Anniversary Sale, praising the variety of products and good deals. However, some customers expressed frustration with website crashes and limited stock on popular items."),
             sentimentSummary: {
                 overall: "Mixed" (e.g., Positive, Somewhat Positive, Mixed, Somewhat Negative, Negative)
                 positive: number (e.g., 8)
@@ -140,7 +171,7 @@ export async function POST(request: Request) {
                 neutral: number (e.g., 6)
             },
             topThemes: [
-                { theme: string (e.g., "Great Prices"), quote: string (a comment you analyzed) },
+                { theme: string (e.g., "Great Values for the Money"), quote: string ("I got such a good deal on Vuori active wear.") },
                 { theme: string, quote: string }
                 { theme: string, quote: string }
             ]
@@ -161,7 +192,6 @@ export async function POST(request: Request) {
         // but you can define a custom JSON object to be returned as well
         // define result object first, wrap it in Response
         // status codes, headers, etc. a part of options object (second obj)
-
         const result = {
             success: true,
             message: "Fetch successful",
@@ -176,7 +206,6 @@ export async function POST(request: Request) {
         console.error("Error in the RedditAPI route:", error);
 
         return NextResponse.json({
-            error: error,
             success: false,
             message: "Something went wrong."
         }, { status: 500 })

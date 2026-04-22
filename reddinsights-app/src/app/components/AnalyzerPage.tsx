@@ -51,10 +51,10 @@ const AnalyzerPage: React.FunctionComponent = () => {
             <Navbar />
             <div>
                 <h1 className="font-bold m-2 text-2xl mt-4">Instructions:</h1>
-                <ul className="m-2 p-1 list-square list-inside">
+                <ul className="m-2 p-1 list-disc list-inside">
                     <li>
                         Enter a Subreddit name (if you know it) or a search you want to get insights for (e.g., McDonalds for http://www.reddit.com/r/McDonalds, <br/>
-                        or a search like &quot;McDondalds value menu&quot;).
+                        or a simple search like &quot;McDonalds menu&quot;).
                     </li>
                     <li>
                         Click the Analyze button.
