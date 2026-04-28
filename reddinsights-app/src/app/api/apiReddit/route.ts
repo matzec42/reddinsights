@@ -130,33 +130,34 @@ export async function POST(request: Request) {
 
         // handling information density (structured compression)
         const redditReplies = await fetchedReplies()
-        console.log("Comments array:", redditReplies);
+        // console.log("Comments array:", redditReplies);
 
         const normalizedReplies = redditReplies.filter(r => typeof r === "string").map(r => r.trim()).filter(r => r.length > 20);
-        console.log("Normalized replies: ", normalizedReplies);
+        // console.log("Normalized comments/replies: ", normalizedReplies);
 
         const MAX_COMMENTS = 40;
         const cappedReplies = normalizedReplies.slice(0, MAX_COMMENTS);
 
         const formattedReplies = cappedReplies.map((r, i) => `Comment ${i + 1}: ${r}`).join("\n\n---\n\n");
-        console.log(`Formatted replies: `, formattedReplies);
+        console.log(`Formatted comments/replies: `, formattedReplies);
 
 
         // error handling for empty erray --- consider early return + error, re-prompt user on frontend (?)
 
         // TO-DO: manage/reduce token usage! --- the redditReplies array could be sanitized (e.g., slice )
 
-        // last AI API call --- analysis of comments (sentiment, #'s of comments, themes & quotations in structured JSON)
+        // second & final AI API call --- analysis of comments (sentiment, #'s of comments, themes & quotations in structured JSON)
         // check / repair format if not in JSON (remember to give it a shape of your Thread document)
         // FUTURE WORK: consider altering the analysis structure (see ideation Google doc). e.g., add a "trend" property (is sentiment going up/down/same)
         const groqPromptTwo = `You are a helpful assistant that does customer sentiment analysis.
+
         Here are is an array of replies from Reddit about ${cleanQuery}.
         Analyze and classify the sentiment of each reply in this array: ${redditReplies}.
         Then, return a summary of your analysis that includes:
         - a short title for the analysis
         - total number of comments analyzed
         - a general summary of all comments analyzed
-        - classification ofoverall sentiment of the comments (positive, somewhat positive, neutral, somewhat negative, negative)
+        - classification of overall sentiment of comments (positive, somewhat positive, neutral, somewhat negative, negative)
         - top 3 themes (a short phrase), each with a quote (from a comment) that is representative of that theme.
         
         Here is an example for the response:
@@ -177,25 +178,36 @@ export async function POST(request: Request) {
             ]
         }`
 
-        const analyzeReplies = await groqCall({
+        const analyzedRawReplies = await groqCall({
             prompt: groqPromptTwo,
-            systemPrompt: "You are a helpful assistant that does customer sentiment analysis and only returns information in JSON format."
+            systemPrompt: "You are a helpful assistant that does customer sentiment analysis and ONLY returns information in JSON format."
         });
 
+
         try {
-            console.log("Returned analysis object from Groq API fetch:", analyzeReplies);
+            console.log("Returned analysis object from Groq API fetch:", analyzedRawReplies);
         } catch {
-            console.error("Failed to parse Groq API response for analysis:", analyzeReplies);
+            console.error("Failed to parse Groq API response for analysis:", analyzedRawReplies);
         }
+
+        // TO-DO: implement a parsing function to remove backticks, markdown code, line breaks (/n), in the raw data
+        // Prompt modification didn't resolve this, so a function here before including in response is necessary
+        const cleanedAnalysis = analyzedRawReplies.replace(/```json\n?/, '').replace(/```$/, '').trim();
+        // console.log("Cleaned analysis string:", cleanedAnalysis);
+        // NOTE: parse error occurs because of incomplete string (it's too long). Can increase max tokens, but token usage limit is hit much faster
+            // consider writing a new Groq-API helper function (see utils folder) specifically for first and second analyses calls...?
+        const parsedAnalysis = JSON.parse(cleanedAnalysis);
+        console.log("Parsed analysis object:", parsedAnalysis);
+
 
         // note on responses --- Next.js requires native Response object to be returned
         // but you can define a custom JSON object to be returned as well
-        // define result object first, wrap it in Response
+        // define result object first, wrap it in NextResponse
         // status codes, headers, etc. a part of options object (second obj)
         const result = {
             success: true,
             message: "Fetch successful",
-            data: analyzeReplies
+            data: analyzedRawReplies
         }
 
         // console.log("Logging fetched data in Reddit API route:", result.data);
