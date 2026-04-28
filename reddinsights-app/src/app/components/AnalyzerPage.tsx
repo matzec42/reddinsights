@@ -1,8 +1,13 @@
 "use client"
 
 import Navbar from '../components/Navbar';
+import Card from '../components/Card';
+import { useState } from 'react';
 
 const AnalyzerPage: React.FunctionComponent = () => {
+    // state for search results
+    const [searchResults, setSearchResults] = useState(null);
+
     // handleSearchSubmit function for user's search term (POST)
     const handleSearchSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -36,7 +41,8 @@ const AnalyzerPage: React.FunctionComponent = () => {
                 return alert(`${fetchedAnalysis.message}. Please try another Analysis with an existing Subreddit.`)
             }
 
-            return console.log(`AnalyzerPage component, after POST, parsed data: ${fetchedAnalysis.data}`);
+            console.log("Fetched analysis:", fetchedAnalysis.data);
+            setSearchResults(fetchedAnalysis);
 
             // dynamically build Insight analysis card with response data
 
@@ -45,6 +51,9 @@ const AnalyzerPage: React.FunctionComponent = () => {
             alert("Something went wrong while trying to fetch insights. Please try again.");
         }
     }
+
+    // TO-DO: fix bug to pass props to Card.tsx (TS error). Related to how JSON object gets returned from backend (as a string/markdown coded block)
+    // Prompt modifying on backend does not fix it, may need to implement a parsing function in API
 
     return (
         <div>
@@ -72,6 +81,10 @@ const AnalyzerPage: React.FunctionComponent = () => {
                 <input className="w-100 border border-gray-300 m-2 p-2 rounded-md" name="query" placeholder="Type a Subreddit name (e.g., Target, Amazon)" />
                 <button className="w-40 py-2 rounded-md text-white font-bold bg-orange-600 hover:bg-orange-400 focus:outline-none focus:ring focus:ring-orange-250" type="submit">Analyze</button>
             </form>
+
+            {searchResults ? <Card className="m-2 p-4 bg-gray-100 rounded-md" analysis={searchResults} />
+                : <p className="m-2 p-4 bg-gray-100 rounded-md">Your analysis will appear here once you submit a search.</p>
+            }
         </div>
     )
 }

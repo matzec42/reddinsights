@@ -20,7 +20,7 @@ export default function Home() {
                 href="/signup">Create a new account
           </Link>
         </main>
-        <footer className="text-center text-sm text-gray-400 mt-6">Reddinsights 2025. Powered by Next.js, RedditAPI and GroqAI.</footer>
+        <footer className="text-center text-sm text-gray-400 mt-6">Reddinsights 2026. Powered by GroqAI.</footer>
       </div>
     </div>
   );

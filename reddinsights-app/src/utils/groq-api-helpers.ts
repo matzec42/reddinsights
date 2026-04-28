@@ -12,7 +12,7 @@ export async function groqCall({
         prompt,
         model = "llama-3.3-70b-versatile",
         temperature = 0.2,
-        maxTokens = 200,
+        maxTokens = 1000,
         topP = 1,
         stream = false,
         stop = null,
