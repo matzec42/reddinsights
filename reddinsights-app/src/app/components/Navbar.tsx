@@ -22,7 +22,7 @@ const Navbar: React.FunctionComponent = () => {
             </Link>
 
             <Link href="/analyzer">
-                <button className="w-full py-2 m-3 rounded-md text-white font-bold bg-orange-600 hover:bg-orange-400 focus:outline-none focus:ring focus:ring-orange-250">
+                <button id="start-new-analysis" className="w-full py-2 m-3 rounded-md text-white font-bold bg-orange-600 hover:bg-orange-400 focus:outline-none focus:ring focus:ring-orange-250">
                     Start a New Analysis
                 </button>
             </Link>

@@ -1,8 +1,7 @@
 import { Groq } from "groq-sdk";
 import { GroqApiCallOptions } from "@/types/groq-api-types/groq-types";
 
-// make new instance of Groq API (passing key as well to ensure it's there for the call)
-// for querying Groq + Llama 3 (good for text-to-text)
+// A new instance of Groq API (passing key as well to ensure it's there for the calls)
 const groq = new Groq(
     { apiKey: process.env.GROQ_API_KEY }
 );
@@ -12,7 +11,7 @@ export async function groqCall({
         prompt,
         model = "llama-3.3-70b-versatile",
         temperature = 0.2,
-        maxTokens = 1000,
+        maxTokens = 1800,
         topP = 1,
         stream = false,
         stop = null,
