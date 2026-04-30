@@ -19,7 +19,7 @@ export async function POST (request: Request) {
         }
 
         // additional login logic --- checking password (see web dev simplified / scrypt, similar to compare with bcrypt, and the /utils folder)
-        // also starting a new session, etc.
+        // also starting a new session, saving to DB, etc.
 
         return NextResponse.json({
             success: true,

@@ -24,7 +24,7 @@ export async function POST (request: Request) {
             }, { status: 400 })
         }
 
-        // password hashing --- see web dev simplified, skeleton code in /utils folders
+        // password hashing --- see web dev simplified, skeleton code in /utils folders (look into scrypt)
 
         // create new User in users document
         const newUser = ReddinsightsSchema.User.create({ email: email, password: password})
