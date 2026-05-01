@@ -7,9 +7,23 @@ import { CardProps } from '../../types/card-component-types.ts/card-component-ty
 const Card: React.FunctionComponent<CardProps> = ({ analysis, className }) => {
     return (
         <div className={className}>
-            <h2 className="font-bold text-xl mb-2">Card Title: {analysis.analysisTitle}</h2>
-            <p>{`Summary: ${analysis.generalSummary}`}</p>
-            <p className="text-gray-700">This is a card component. It can be used to display insights, analysis, or other content related to the AI-analyzed Reddit data.</p>
+            <h2 className="font-bold text-xl mb-2">Title: {analysis.analysisTitle}</h2>
+            <p>Comment Count: {analysis.commentCount}</p>
+            <p>Summary: {analysis.generalSummary}</p>
+            <ul>Overall Sentiment: {analysis.sentimentSummary.overall}
+                <li>Positive: {analysis.sentimentSummary.positive}</li>
+                <li>Negative: {analysis.sentimentSummary.negative}</li>
+                <li>Neutral: {analysis.sentimentSummary.neutral}</li>
+            </ul>
+            <h3 className="font-semibold mt-4">Top Themes:</h3>
+            <ul>
+                {analysis.topThemes.map((themeObj: { theme: string, quote: string }, index: number) => (
+                    <li key={index}>
+                        <p className="font-medium">Theme: {themeObj.theme}</p>
+                        <p className="italic">Quote: &quot;{themeObj.quote}&quot;</p>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 };

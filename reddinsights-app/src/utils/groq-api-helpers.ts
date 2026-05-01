@@ -1,7 +1,7 @@
 import { Groq } from "groq-sdk";
 import { GroqApiCallOptions } from "@/types/groq-api-types/groq-types";
 
-// A new instance of Groq API (passing key as well to ensure it's there for the calls)
+// A new instance of Groq API (passing in key as well to ensure it's there for the calls)
 const groq = new Groq(
     { apiKey: process.env.GROQ_API_KEY }
 );
@@ -11,7 +11,7 @@ export async function groqCall({
         prompt,
         model = "llama-3.3-70b-versatile",
         temperature = 0.2,
-        maxTokens = 1800,
+        maxTokens = 1600,
         topP = 1,
         stream = false,
         stop = null,

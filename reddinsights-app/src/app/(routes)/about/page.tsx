@@ -1,5 +1,4 @@
 
-
 const AboutPage: React.FunctionComponent = () => {
     return (
         <div>

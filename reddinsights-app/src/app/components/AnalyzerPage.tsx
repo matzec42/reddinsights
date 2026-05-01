@@ -69,10 +69,10 @@ const AnalyzerPage: React.FunctionComponent = () => {
                 <ul className="m-2 p-1 list-disc list-inside">
                     <li>
                         Enter a Subreddit name (if you know it) or a search you want to get insights for (e.g., McDonalds for http://www.reddit.com/r/McDonalds, <br/>
-                        or a simple search like &quot;McDonalds menu&quot;).
+                        or a simple search like &quot;McDonalds value menu&quot;).
                     </li>
                     <li>
-                        Click the Analyze button.
+                        Click &quot;General Analysis&quot; or, for more tailored insights, select a specific analysis type (&quot;Brand Insights&quot; or &quot;Student Trends&quot;).
                     </li>
                     <li>
                         Reddinsights will perform an AI-powered analysis of top Subreddit posts and replies. <br/>
@@ -85,6 +85,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
 
             <form onSubmit={handleSearchSubmit} method="post">
                 <input className="w-100 border border-gray-300 m-2 p-2 rounded-md" name="query" placeholder="Type a subreddit name or topic (e.g., Target, Amazon)" />
+
                 <button id="general-analysis" onClick={() => setAnalysisType("general")}disabled={isLoading}  type="submit" className="w-40 py-2 rounded-md text-white font-bold bg-orange-600 hover:bg-orange-400 focus:outline-none focus:ring focus:ring-orange-250">
                     {isLoading ? "Analyzing..." : "General Analysis"}
                 </button>
