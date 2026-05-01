@@ -1,5 +1,6 @@
 import { ReddinsightsSchema } from '@/lib/models';
 import { NextResponse } from 'next/server';
+import { hashPassword } from '@/lib/auth-helpers';
 
 export async function POST (request: Request) {
     try {
@@ -11,23 +12,26 @@ export async function POST (request: Request) {
         if (!email || !password) {
             return NextResponse.json({
                 success: false,
-                message: "Failed to sign up."
+                message: "Invalid credentials. Failed to sign up."
             }, { status: 400 })
         }
 
         // handling if user email already exists
         const existingUser = await ReddinsightsSchema.User.findOne({ email });
+
         if (existingUser) {
             return NextResponse.json({
                 success: false,
                 message: "User already exists. Please login."
-            }, { status: 400 })
+            }, { status: 409 })
         }
 
-        // password hashing --- see web dev simplified, skeleton code in /utils folders (look into scrypt)
+        // password hashing
+        const hashedPassword = await hashPassword(password);
+
 
         // create new User in users document
-        const newUser = ReddinsightsSchema.User.create({ email: email, password: password})
+        const newUser = await ReddinsightsSchema.User.create({ email: email, password: hashedPassword });
 
         return NextResponse.json({
             success: true,

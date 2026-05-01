@@ -48,8 +48,10 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
     return allReplies
 };
 
-// FUTURE WORK: various options for how to query Reddit API ---  Snoowrap functions (getTop w/ a time option) to fetch Top or Hot comments for threads.
-// Consider experimenting with different options for fetching comments (e.g., top vs hot, time range) to see how it impacts the quality of the insights.
-// For example, top comments from the past month might yield more relevant insights than hot comments from all time,
-// which could be dominated by older posts with lots of upvotes.
-// This could be implemented as an additional option in the frontend for users to select their preferred comment fetching strategy.
+// **FUTURE WORK:** various options for how to query Reddit API ---  Snoowrap functions (getTop w/ a time option) to fetch Top or Hot comments for threads.
+    // Consider experimenting with different options for fetching comments (e.g., top vs hot, time range) to see how it impacts the quality of the insights.
+    // For example, top comments from the past month could have more relevant insights than hot comments from all time,
+    // which could be dominated by older posts with lots of upvotes.
+    // Could implement as an additional option in the frontend for users to select their preferred comment fetching strategy.
+
+// Since comments will be fetched, future work could also include sending them if user requests (e.g., "Click to see comments fetched" so that they can get a sense of quality and modify their next search accordingly)

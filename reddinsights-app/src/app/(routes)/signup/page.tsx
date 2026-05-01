@@ -7,7 +7,7 @@ import Link from "next/link";
 const Signup: React.FunctionComponent = () => {
     // state for signup
     const [message, setMessage] = useState("");
-    const [isSuccessful, setIsSuccessful] = useState(false);
+    const [signedIn, setIsSignedIn] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
 
     const handleSignup = async (data: { email: string, password: string }) => {
@@ -21,7 +21,7 @@ const Signup: React.FunctionComponent = () => {
         setMessage(result.message);
 
         if (result.data) {
-            setIsSuccessful(true);
+            setIsSignedIn(true);
             setIsSuccess(true);
         } else {
             setIsSuccess(false);
@@ -31,7 +31,7 @@ const Signup: React.FunctionComponent = () => {
     return (
         <div className="flex flex-col items-center text-center pt-12">
             <div>
-                { isSuccessful ? (
+                { signedIn ? (
                     <>
                         <p className="text-gray-700 text-center text-lg font-semibold">
                             Welcome!
@@ -51,7 +51,7 @@ const Signup: React.FunctionComponent = () => {
                     </p>
                 )}
 
-                {isSuccessful && (
+                {signedIn && (
                     <Link href="/"
                         className="font-bold hover:underline text-gray-700 hover:text-blue-500 transition-colors duration-200">
                         Back to login

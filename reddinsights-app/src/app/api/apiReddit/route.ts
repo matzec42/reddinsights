@@ -1,9 +1,9 @@
 /* Main API route for handling Reddit data fetching and AI analysis */
 
 import { NextResponse } from "next/server";
-import { groqCall } from '@/utils/groq-api-helpers';
+import { groqCall } from '@/lib/groq-api-helpers';
 import { analysisConfigs } from "@/lib/analysisConfigs";
-import { getRedditReplies } from "@/utils/reddit-api-helper";
+import { getRedditReplies } from "@/lib/reddit-api-helper";
 
 
 // Function to query the RedditAPI, perform AI analysis
@@ -74,7 +74,7 @@ export async function POST(request: Request) {
         
 
         /* Structured Compression --- Filtering/Normalizing (.filter), Capping (.slice), Formatting (.map w/ .join) */
-        // cleaner way to normalize/filter/slice comments array --- one chain
+        // see utils folder for this --- consider modifying for comment quality, length, etc. (also shuffling for )
         const formattedReplies = redditReplies
             .filter(r => typeof r === "string" && r.trim().length > 20)
             .slice(0, config.maxComments)

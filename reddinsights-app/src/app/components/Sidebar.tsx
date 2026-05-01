@@ -15,6 +15,7 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({ isOpen }) => {
                 <li><Link href="/about">About</Link></li>
                 <li><Link href="/contact">Contact</Link></li>
                 <li><Link href="/create-pdf">Create a PDF</Link></li>
+                <li><Link href="/dashboard">Dashboard</Link></li>
             </ul>
         </div>
     );

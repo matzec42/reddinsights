@@ -97,7 +97,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
                 </button> 
             </form>
 
-            {searchResults ? <Card className="m-2 p-4 bg-gray-100 rounded-md" analysis={searchResults} />
+            {searchResults ? <Card analysis={searchResults} />
                 : <p className="m-2 p-4 bg-gray-100 rounded-md">Your analysis will appear here once you submit a search.</p>
             }
         </div>

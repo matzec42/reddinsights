@@ -1,7 +1,7 @@
 import Login from "./(routes)/login/page"
 import Link from "next/link"
 
-// login page, direct to signup
+// landing page --- login, direct to signup
 
 export default function Home() {
   return (

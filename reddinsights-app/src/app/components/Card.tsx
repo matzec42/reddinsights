@@ -4,10 +4,10 @@
 import React from 'react';
 import { CardProps } from '../../types/card-component-types.ts/card-component-type';
 
-const Card: React.FunctionComponent<CardProps> = ({ analysis, className }) => {
+const Card: React.FunctionComponent<CardProps> = ({ analysis }) => {
     return (
-        <div className={className}>
-            <h2 className="font-bold text-xl mb-2">Title: {analysis.analysisTitle}</h2>
+        <div className="m-2 p-4 bg-gray-100 rounded-md">
+            <h2 className="font-bold text-xl mb-2">{analysis.analysisTitle}</h2>
             <p>Comment Count: {analysis.commentCount}</p>
             <p>Summary: {analysis.generalSummary}</p>
             <ul>Overall Sentiment: {analysis.sentimentSummary.overall}

@@ -33,14 +33,19 @@ const Navbar: React.FunctionComponent = () => {
                     </button>
                 </Link>
 
-                <Link href="">
+                <button
+                    onClick={async () => {
+                        await fetch('/api/auth/logout', { method: 'POST' })
+                        window.location.href = '/'
+                    }}
+                >
                     <Image
                         width={30}
                         height={30}
                         alt={"Logout button"}
                         src={"/logout.svg"}
                     />
-                </Link>
+                </button>
             </nav>
 
             <Sidebar isOpen={isClicked} />

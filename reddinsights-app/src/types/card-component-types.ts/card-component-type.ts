@@ -15,5 +15,4 @@ export interface Analysis {
 
 export interface CardProps {
     analysis: Analysis;
-    className?: string;
 }

@@ -1,3 +1,4 @@
+import { create } from "domain";
 import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -16,7 +17,14 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true }
+    password: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
+});
+
+const sessionSchema = new Schema({
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    sessionToken: { type: String, required: true, unique: true },
+    createdAt: { type: Date, default: Date.now, expires: '1d' } // Session expires after 1 day
 });
 
 const threadSchema = new Schema({
@@ -78,8 +86,9 @@ const cardSchema = new Schema({
 });
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);
+const Session = mongoose.models.Session || mongoose.model("Session", sessionSchema);
 const Thread = mongoose.models.Thread || mongoose.model("Thread", threadSchema);
 const Comment = mongoose.models.Comment || mongoose.model("Comment", commentSchema);
 const Card = mongoose.models.Card || mongoose.model("Card", cardSchema);
 
-export const ReddinsightsSchema = { User, Thread, Comment, Card }
+export const ReddinsightsSchema = { User, Session, Thread, Comment, Card }
