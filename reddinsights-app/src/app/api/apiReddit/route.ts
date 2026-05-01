@@ -1,25 +1,12 @@
-// logic to query Reddit API w/ users search term
+/* Main API route for handling Reddit data fetching and AI analysis */
 
 import { NextResponse } from "next/server";
-import { groqCall } from '@/utils/groq-api-helpers';
+import { groqCall } from '@/lib/groq-api-helpers';
 import { analysisConfigs } from "@/lib/analysisConfigs";
-import snoowrap from "snoowrap";
-
-// logic to query RedditAPI
-// using Snoowrap library as a wrapper to do this more cleanly
-const redditRequest = new snoowrap({
-    clientId: process.env.REDDIT_CLIENT_ID,
-    clientSecret: process.env.REDDIT_CLIENT_SECRET,
-    username: process.env.REDDIT_USERNAME,
-    password: process.env.REDDIT_PASSWORD,
-    userAgent: process.env.REDDIT_USER_AGENT || 'my default user agent'
-});
-
-// to avoid type issues with Listing returns from Reddit API
-redditRequest.config({ proxies: false });
+import { getRedditReplies } from "@/lib/reddit-api-helper";
 
 
-// function to query the RedditAPI, perform AI analysis
+// Function to query the RedditAPI, perform AI analysis
 export async function POST(request: Request) {
     try {
         // parse the req body
@@ -56,11 +43,11 @@ export async function POST(request: Request) {
         });
 
         // type safety --- parse the fetched Listing of subreddit titles
-        let getSubreddits: string[] = [];
+        let fetchedSubreddits: string[] = [];
 
         try {
-            getSubreddits = JSON.parse(subredditList);
-            console.log("Parsed subreddit list:", getSubreddits);
+            fetchedSubreddits = JSON.parse(subredditList);
+            console.log("Parsed subreddit list:", fetchedSubreddits);
         } catch (err) {
             console.error("Failed to parse subreddit response:", subredditList, {
                 error: err,
@@ -73,10 +60,11 @@ export async function POST(request: Request) {
         }
         
 
+        /* Reddit API call --- returns an array of comments from the fetched subreddits */
         // **TO-DO**: edge case / error handling for empty array (no relevant subreddits found) ... after the first prompt, it's possible it could be empty
+        const redditReplies = await getRedditReplies(fetchedSubreddits, cleanQuery);
         
-        // Various options for how to query Reddit API ---  Snoowrap functions (getTop w/ a time option) to fetch Top or Hot comments for threads
-        
+
         // FUTURE WORK --- quality of fetched comments isn't always great / relevant...
         // why? e.g., why can't I get the posts that are on the front page of the /r/Nordstrom1901 (ANSWER: proprietary Reddit thing, regular joes don't get access to the latest & greatest...)
         // consider tracking/looking at subreddit URLs on fetched replies --> for second API query, prompt it to focus on most relevant and focus on customer sentiment only (not employees, ads, etc.). See Groq AI Docs --> Prompting Guide
@@ -85,46 +73,8 @@ export async function POST(request: Request) {
         // implement hueristics to select certain number of comments, comment length, or with certain keywords (?) to improve relevance, quality for analysis 
         
 
-        /* Reddit API call --- returns a Listing of values (see Reddit, Snoowrap docs) */
-        // FUTURE WORK: add to /utils to modularize
-        const fetchReplies = async () => {
-            const allReplies: Array<string> = [];
-            for (const sub of getSubreddits) {
-                try {
-                    // Reddit API returns lazy-loaded Listings
-                    const listing = await redditRequest
-                        .getSubreddit(sub)
-                        .search({
-                            query: cleanQuery,
-                            sort: "relevance",
-                            time: "month",
-                        });
-
-                    // copy Listing in brackets to make it an iterable array
-                    for (const post of [...listing]) {
-                        if (post.selftext && post.selftext.trim() !== "") {
-                            // console.log(`Post from r/${sub}:`, post.title);
-                            allReplies.push(post.selftext);
-                        }
-                    }
-                
-                } catch (err) {
-                    // for private, banned or removed/non-existent Subreddits (getting 403, 404 errors)
-                    if (err instanceof Error) {
-                        console.warn(`Skipping r/${sub} due to error:`, err.message);
-                    } else {
-                        console.warn(`Skipping r/${sub} due to unknown error:`, err);
-                    }
-                    continue;
-                }
-            }
-            return allReplies
-        };
-
-
         /* Structured Compression --- Filtering/Normalizing (.filter), Capping (.slice), Formatting (.map w/ .join) */
-        const redditReplies = await fetchReplies();
-        // cleaner way to normalize/filter/slice comments array --- one chain
+        // see utils folder for this --- consider modifying for comment quality, length, etc. (also shuffling for )
         const formattedReplies = redditReplies
             .filter(r => typeof r === "string" && r.trim().length > 20)
             .slice(0, config.maxComments)
@@ -136,7 +86,6 @@ export async function POST(request: Request) {
 
 
         /* Second AI API call --- Sentiment Analysis (returns a JSON object with analysis results) */
-
         const analyzedRaw = await groqCall({
             prompt: config.analysisPrompt(cleanQuery, formattedReplies),
             model: config.modelAnalysis,
@@ -159,8 +108,8 @@ export async function POST(request: Request) {
             // adjusting maxTokens in the Groq API call (see utils/groq-api-helpers.ts)
             // adjust # of comments in formattedReplies (see config.maxComments in lib/analysisConfigs.ts)
             // adjust/limit length of comments in the formatting step above (e.g., .slice(0, config.maxComments) or filter out longer comments in the .filter step)
-        const parsedAnalysis = JSON.parse(cleanedAnalysis);
-        console.log("Parsed analysis object:", parsedAnalysis);
+        const parsedFinalAnalysis = JSON.parse(cleanedAnalysis);
+        console.log("Parsed analysis object:", parsedFinalAnalysis);
 
 
         // NOTE RE:responses --- Next.js requires native Response object to be returned
@@ -170,7 +119,7 @@ export async function POST(request: Request) {
         const result = {
             success: true,
             message: "Fetch successful",
-            data: parsedAnalysis
+            data: parsedFinalAnalysis
         }
 
         return NextResponse.json(result, { status: 200 });

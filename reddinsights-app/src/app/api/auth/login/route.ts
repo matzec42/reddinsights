@@ -1,11 +1,12 @@
 import { ReddinsightsSchema } from '@/lib/models';
 import { NextResponse } from 'next/server';
+import { comparePasswords, createSession } from '@/lib/auth-helpers';
 
 export async function POST (request: Request) {
     try {
         // parse the req body
         const body = await request.json();
-        const { email } = body;
+        const { email, password } = body;
 
         // query database
         const user = await ReddinsightsSchema.User.findOne({ email });
@@ -14,12 +15,22 @@ export async function POST (request: Request) {
         if (!user) {
             return NextResponse.json({
                 success: false,
-                message: "User not found.",
-            }, { status: 404, })
+                message: "Invalid credentials.",
+            }, { status: 401, })
         }
 
-        // additional login logic --- checking password (see web dev simplified / scrypt, similar to compare with bcrypt, and the /utils folder)
-        // also starting a new session, saving to DB, etc.
+        // password verification (compare with hashed password in DB)
+        const validUser = await comparePasswords(password, user.password);
+
+        if (!validUser) {
+            return NextResponse.json({
+                success: false,
+                message: "Invalid credentials.",
+            }, { status: 401, })
+        }
+
+        //creates session and sets cookie
+        await createSession(user._id.toString())
 
         return NextResponse.json({
             success: true,

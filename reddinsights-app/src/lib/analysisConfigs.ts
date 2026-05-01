@@ -1,3 +1,5 @@
+// LLM model and prompt configurations for different types of analyses (general, brand insights, student trends)
+
 export type AnalysisType = "general" | "brand" | "student";
 
 type AnalysisConfig = {
@@ -27,19 +29,13 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
 
         analysisPrompt:(query, data) => {
             const promptData = Array.isArray(data) ? data.join("\n\n---\n\n") : data;
-            return `You are a sentiment analysis engine.
+            return `
+            You are a sentiment analysis engine.
 
             Here are is an array of replies from Reddit about "${query}".
             Analyze the following Reddit comments: ${promptData}.
 
             Return JSON with keys:
-            - analysisTitle
-            - commentCount
-            - generalSummary
-            - sentimentSummary
-            - topThemes (3-4 top themes)
-            
-            Here is an example response:
                 {
                     analysisTitle: string,
                     commentCount: number,
@@ -89,12 +85,6 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             - competitor mentions
 
             Return JSON with keys:
-            - analysisTitle
-            - generalSummary (focus on customer perception of brand)
-            - sentimentSummary
-            - topThemes (top 3-4 themes)
-
-            Here is an example response:
                 {
                     analysisTitle: string,
                     commentCount: number,
@@ -122,13 +112,13 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
     /* Student Trends Config */
     student: {
         subredditPrompt: (query) => `
-        Find 5 public Reddit communities that where students have first-hand discussions about "${query}". Prioritize communities where:
-            - Most posts are user-generated (not news or memes).
-            - Posts focus mostly on customer reviews, product reviews, complaints, comparisons.
-            - The community is active (recent posts within the last month).
-        If the query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901, etc.), make sure it gets included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid NSFW, off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"].
-        Return ONLY JSON array.
-    `,
+            Find 5 public Reddit communities that where students have first-hand discussions about "${query}". Prioritize communities where:
+                - Most posts are user-generated (not news or memes).
+                - Posts focus mostly on customer reviews, product reviews, complaints, comparisons.
+                - The community is active (recent posts within the last month).
+            If the query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901, etc.), make sure it gets included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid NSFW, off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"].
+            Return ONLY JSON array.
+        `,
 
         analysisPrompt: (query, data) => {
             const promptData = Array.isArray(data) ? data.join("\n\n---\n\n") : data;
@@ -144,12 +134,6 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             - affordability
 
             Return JSON with keys:
-            - analysisTitle
-            - generalSummary
-            - sentimentSummary
-            - topThemes (top 3-4 themes)
-
-            Here is an example response:
                 {
                     analysisTitle: string,
                     commentCount: number,
