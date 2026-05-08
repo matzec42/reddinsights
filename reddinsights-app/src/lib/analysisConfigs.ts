@@ -20,11 +20,11 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
     /* General Analysis Config */
     general: {
         subredditPrompt: (query) => `
-            Find 5 public Reddit communities that are most likely to contain detailed, first-hand user discussions and opinions directly about ${query}. Prioritize communities where:
+            Find 5 public Reddit communities that are most likely to have detailed, first-hand user discussions and opinions about ${query}. Prioritize communities where:
                 - Most posts are user-generated (not news or memes).
-                - Posts focus mostly on customer reviews, experiences and sentiments.
+                - Posts focus on customer reviews, experiences and sentiments.
                 - The community is active (recent posts within the last month).
-            If the query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901, etc.), make sure it gets included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid NSFW, off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"]
+            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid NSFW, off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"]
         `,
 
         analysisPrompt:(query, data) => {
@@ -63,11 +63,11 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
     /* Brand Insights Config */
     brand: {
         subredditPrompt: (query) => `
-            Find 5 public Reddit communities that are focused on brand perception in first-hand user discussions about "${query}". Prioritize communities where:
+            Find 5 public Reddit communities that focus on brand perception in user discussions about "${query}". Prioritize communities where:
                 - Most posts are user-generated (not news or memes).
                 - Posts focus mostly on customer reviews, product reviews, complaints, comparisons.
                 - The community is active (recent posts within the last month).
-            If the query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901, etc.), make sure it gets included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid NSFW, off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"].
+            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid NSFW, off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"].
             Return ONLY JSON array.
         `,
 
@@ -112,11 +112,11 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
     /* Student Trends Config */
     student: {
         subredditPrompt: (query) => `
-            Find 5 public Reddit communities that where students have first-hand discussions about "${query}". Prioritize communities where:
+            Find 5 public Reddit communities where students have discussions about "${query}". Prioritize communities where:
                 - Most posts are user-generated (not news or memes).
                 - Posts focus mostly on customer reviews, product reviews, complaints, comparisons.
                 - The community is active (recent posts within the last month).
-            If the query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901, etc.), make sure it gets included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid NSFW, off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"].
+            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid NSFW, off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"].
             Return ONLY JSON array.
         `,
 

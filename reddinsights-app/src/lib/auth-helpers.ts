@@ -19,7 +19,7 @@ export async function comparePasswords(password: string, hashedPassword: string)
 // function to create session 
 export async function createSession(userId: string): Promise<string> {
     const sessionToken = crypto.randomUUID();
-    console.log("Generated session token:", sessionToken);
+    // console.log("Generated session token:", sessionToken);
 
     await ReddinsightsSchema.Session.create({ userId, sessionToken });
 
@@ -49,7 +49,7 @@ export async function getSession() {
 export async function deleteSession() {
     const cookieStore = await cookies();
     const sessionToken = cookieStore.get('session')?.value;
-    console.log("Session token to be deleted:", sessionToken);
+    // console.log("Session token to be deleted:", sessionToken);
 
     if (sessionToken) {
         await ReddinsightsSchema.Session.deleteOne({ sessionToken });

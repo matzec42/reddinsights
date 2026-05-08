@@ -15,7 +15,7 @@ export async function groqCall({
         topP = 1,
         stream = false,
         stop = null,
-        systemPrompt = "You are a helpful assistant."
+        systemPrompt = "You are a sentiment analyst."
     }: GroqApiCallOptions): Promise<string> {
 
     const response = await groq.chat.completions.create({
