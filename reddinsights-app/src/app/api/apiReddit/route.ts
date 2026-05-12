@@ -59,18 +59,22 @@ export async function POST(request: Request) {
             }, { status: 500 });
         }
         
+        // **TO-DO**: edge case / error handling for empty array (no relevant subreddits found) ... after the first prompt, it's possible it could be empty
+
 
         /* Reddit API call --- returns an array of comments from the fetched subreddits */
-        // **TO-DO**: edge case / error handling for empty array (no relevant subreddits found) ... after the first prompt, it's possible it could be empty
         const redditReplies = await getRedditReplies(fetchedSubreddits, cleanQuery);
         
 
-        // FUTURE WORK --- quality of fetched comments isn't always great / relevant...
+        // **TO-DO**: error handling for empty erray (no comments able to be fetched) --- consider early return + error, re-prompt user on frontend
+
+
+        // FUTURE WORK --- continue improving quality, relevance of fetched comments
         // why? e.g., why can't I get the posts that are on the front page of the /r/Nordstrom1901 (ANSWER: proprietary Reddit thing, regular joes don't get access to the latest & greatest...)
         // consider tracking/looking at subreddit URLs on fetched replies --> for second API query, prompt it to focus on most relevant and focus on customer sentiment only (not employees, ads, etc.). See Groq AI Docs --> Prompting Guide
-        // expandReplies() to a certain depth perhaps?  more expensive Reddit calls...
+        // expandReplies() to a certain depth perhaps?  means more expensive Reddit calls...
         // also need to account for popular / hot topics, too many or too long of comment threads -> too many tokens for second Groq call of analysis (array is too large). Limit comments by string length?
-        // implement hueristics to select certain number of comments, comment length, or with certain keywords (?) to improve relevance, quality for analysis 
+        // implement hueristics to select certain number of comments, comment length (not too short, maximum length), or with certain keywords (?) to improve relevance, quality for analysis 
         
 
         /* Structured Compression --- Filtering/Normalizing (.filter), Capping (.slice), Formatting (.map w/ .join) */
@@ -80,9 +84,6 @@ export async function POST(request: Request) {
             .slice(0, config.maxComments)
             .map((r, i) => `Comment ${i + 1}: ${r.trim()}`)
             .join("\n\n---\n\n");
-
-
-        // **TO-DO**: error handling for empty erray (no comments able to be fetched) --- consider early return + error, re-prompt user on frontend
 
 
         /* Second AI API call --- Sentiment Analysis (returns a JSON object with analysis results) */
@@ -104,10 +105,12 @@ export async function POST(request: Request) {
         const cleanedAnalysis = analyzedRaw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
         // console.log("Cleaned analysis string:", cleanedAnalysis);
 
-        // NOTE: parse error can occur because of incomplete string (i.e., if it's too long). Manage by:
+        // final parsing analysis
+        // NOTE: parse error can occur because of incomplete/truncated string (i.e., if it's too long). Manage by:
             // adjusting maxTokens in the Groq API call (see utils/groq-api-helpers.ts)
             // adjust # of comments in formattedReplies (see config.maxComments in lib/analysisConfigs.ts)
-            // adjust/limit length of comments in the formatting step above (e.g., .slice(0, config.maxComments) or filter out longer comments in the .filter step)
+            // adjust/limit length of comments in the formatting step above (e.g., .slice(0, config.maxComments)
+            // or filter out longer comments in the .filter step)
         const parsedFinalAnalysis = JSON.parse(cleanedAnalysis);
         console.log("Parsed analysis object:", parsedFinalAnalysis);
 

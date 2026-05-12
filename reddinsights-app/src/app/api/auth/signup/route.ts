@@ -29,8 +29,7 @@ export async function POST (request: Request) {
         // password hashing
         const hashedPassword = await hashPassword(password);
 
-
-        // create new User in users document
+        // create a new User (new User document)
         const newUser = await ReddinsightsSchema.User.create({ email: email, password: hashedPassword });
 
         return NextResponse.json({
