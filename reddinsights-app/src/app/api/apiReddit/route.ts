@@ -43,6 +43,7 @@ export async function POST(request: Request) {
         });
 
         // type safety --- parse the fetched Listing of subreddit titles
+        // TO-DO: additional defensive parsing (formatting can be incosistent)
         let fetchedSubreddits: string[] = [];
 
         try {
@@ -60,19 +61,23 @@ export async function POST(request: Request) {
         }
         
         // **TO-DO**: edge case / error handling for empty array (no relevant subreddits found) ... after the first prompt, it's possible it could be empty
+            // early exit and response here --- avoids Reddit fetch, second AI API analysis call
+            // on frontend, a message to try a new search to yield results
 
 
         /* Reddit API call --- returns an array of comments from the fetched subreddits */
         const redditReplies = await getRedditReplies(fetchedSubreddits, cleanQuery);
         
 
-        // **TO-DO**: error handling for empty erray (no comments able to be fetched) --- consider early return + error, re-prompt user on frontend
+        // **TO-DO**: error handling for empty erray (search was valid/executed b/c subreddits were found and used to query, but no comments were fetched)
+            //early exit and response here --- avoids second AI API analysis call
+            // on frontend, a message and re-prompt user (frontend)
 
 
         // FUTURE WORK --- continue improving quality, relevance of fetched comments
         // why? e.g., why can't I get the posts that are on the front page of the /r/Nordstrom1901 (ANSWER: proprietary Reddit thing, regular joes don't get access to the latest & greatest...)
         // consider tracking/looking at subreddit URLs on fetched replies --> for second API query, prompt it to focus on most relevant and focus on customer sentiment only (not employees, ads, etc.). See Groq AI Docs --> Prompting Guide
-        // expandReplies() to a certain depth perhaps?  means more expensive Reddit calls...
+        // expandReplies() to a certain depth perhaps?  means more expensive Reddit calls.
         // also need to account for popular / hot topics, too many or too long of comment threads -> too many tokens for second Groq call of analysis (array is too large). Limit comments by string length?
         // implement hueristics to select certain number of comments, comment length (not too short, maximum length), or with certain keywords (?) to improve relevance, quality for analysis 
         

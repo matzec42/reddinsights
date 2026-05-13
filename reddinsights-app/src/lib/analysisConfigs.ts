@@ -15,6 +15,7 @@ type AnalysisConfig = {
 // TO-DO: experiment with config options (tokens, temperature) for the differents types; simplify/reduce directions without sacrificing quality of AI output; even try different models
     // using more efficient model (8b-instant) for the basic task of finding subreddits --- less expensive
     // using more powerful model (70b-versatile) for the actual analysis of the comments --- more expensive, but want higher quality output for the analysis
+// TO-DO: along with frontend (AnazlyerPage --> Card), debug the date stamp (inaccurate)
 
 export const analysisConfigs: Record<string, AnalysisConfig> = {
     /* General Analysis Config */
@@ -38,6 +39,7 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             Return JSON with keys:
                 {
                     analysisTitle: string,
+                    createdAt: new Date(),
                     commentCount: number,
                     generalSummary: string,
                     sentimentSummary: {
@@ -79,14 +81,15 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             Analyze customer perception of "${query}" using: ${promptData}.
 
             Focus on:
-            - pricing perception
-            - product quality
             - brand sentiment
-            - competitor mentions
+            - product quality
+            - pricing perception
+            - competitor mentions (names, specific products or services)
 
             Return JSON with keys:
                 {
                     analysisTitle: string,
+                    createdAt: new Date(),
                     commentCount: number,
                     generalSummary: string,
                     sentimentSummary: {
@@ -130,12 +133,13 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             Focus on:
             - student experiences
             - trends
-            - usage patterns
+            - behavior patterns
             - affordability
 
             Return JSON with keys:
                 {
                     analysisTitle: string,
+                    createdAt: new Date(),
                     commentCount: number,
                     generalSummary: string,
                     sentimentSummary: {
