@@ -7,23 +7,32 @@ import { CardProps } from '../../types/card-component-types.ts/card-component-ty
 const Card: React.FunctionComponent<CardProps> = ({ analysis }) => {
     return (
         <div className="m-2 p-4 bg-gray-100 rounded-md">
-            <h2 className="font-bold text-xl mb-2">{analysis.analysisTitle}</h2>
-            <p>Comment Count: {analysis.commentCount}</p>
-            <p>Summary: {analysis.generalSummary}</p>
-            <ul>Overall Sentiment: {analysis.sentimentSummary.overall}
-                <li>Positive: {analysis.sentimentSummary.positive}</li>
-                <li>Negative: {analysis.sentimentSummary.negative}</li>
-                <li>Neutral: {analysis.sentimentSummary.neutral}</li>
-            </ul>
-            <h3 className="font-semibold mt-4">Top Themes:</h3>
-            <ul>
-                {analysis.topThemes.map((themeObj: { theme: string, quote: string }, index: number) => (
-                    <li key={index}>
-                        <p className="font-medium">Theme: {themeObj.theme}</p>
-                        <p className="italic">Quote: &quot;{themeObj.quote}&quot;</p>
-                    </li>
-                ))}
-            </ul>
+            {/* <div className="flex justify-between items-start mb-2"> */}
+                <h2 className="font-bold text-xl mb-2">
+                    {analysis.analysisTitle}
+                </h2>
+
+                <p className="text-sm text-gray-500">
+                    {new Date(analysis.createdAt).toLocaleString()}
+                </p>
+                <p>Comment Count: {analysis.commentCount}</p>
+                <p>Summary: {analysis.generalSummary}</p>
+
+                <ul>Overall Sentiment: {analysis.sentimentSummary.overall}
+                    <li>Positive: {analysis.sentimentSummary.positive}</li>
+                    <li>Negative: {analysis.sentimentSummary.negative}</li>
+                    <li>Neutral: {analysis.sentimentSummary.neutral}</li>
+                </ul>
+                <h3 className="font-semibold mt-4">Top Themes:</h3>
+                <ul>
+                    {analysis.topThemes.map((themeObj: { theme: string, quote: string }, index: number) => (
+                        <li key={index}>
+                            <p className="font-medium">Theme: {themeObj.theme}</p>
+                            <p className="italic">Quote: &quot;{themeObj.quote}&quot;</p>
+                        </li>
+                    ))}
+                </ul>
+            {/* </div> */}
         </div>
     );
 };

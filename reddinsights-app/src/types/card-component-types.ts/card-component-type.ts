@@ -2,6 +2,7 @@
 
 export interface Analysis {
     analysisTitle: string;
+    createdAt: Date
     commentCount: number;
     generalSummary: string;
     sentimentSummary: {

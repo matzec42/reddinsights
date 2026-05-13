@@ -61,47 +61,152 @@ const AnalyzerPage: React.FunctionComponent = () => {
     // TO-DO: fix bug to pass props to Card.tsx (TS error). Related to how JSON object gets returned from backend (as a string/markdown coded block)
     // Prompt modifying on backend does not fix it, may need to implement a parsing function in API
 
+    // return (
+    //     <div className="max-w-6xl mx-auto px-4 py-6">
+    //         <Navbar />
+    //         <div>
+    //             <h1 className="font-bold m-2 text-2xl mt-4">Instructions:</h1>
+    //             <ul className="m-2 p-1 list-disc list-inside">
+    //                 <li>
+    //                     Enter a Subreddit name (if you know it) or a search topic you want to get insights for (e.g., McDonalds for http://www.reddit.com/r/McDonalds, <br/>
+    //                     or a simple search like &quot;McDonalds value menu&quot;).
+    //                 </li>
+    //                 <li>
+    //                     Click &quot;General Analysis&quot; or, for more tailored insights, select a specific analysis type (&quot;Brand Insights&quot; or &quot;Student Trends&quot;).
+    //                 </li>
+    //                 <li>
+    //                     Reddinsights will perform an AI-powered analysis of top Reddit discussions and comments. <br/>
+    //                 </li>
+    //                 <li>
+    //                     Save the analysis to your collection, or click on the &quot;Start a New Analysis&quot; in the navigation to start fresh with a new one.
+    //                 </li>
+    //             </ul>
+    //         </div>
+
+    //         <form onSubmit={handleSearchSubmit} method="post">
+    //             <input className="w-100 border border-gray-300 m-2 p-2 rounded-md" name="query" maxLength={30} required placeholder="Type a subreddit name or topic (e.g., Target, Amazon)" />
+
+    //             <button id="general-analysis" onClick={() => setAnalysisType("general")}disabled={isLoading}  type="submit" className="w-40 py-2 rounded-md text-white font-bold bg-orange-600 hover:bg-orange-400 focus:outline-none focus:ring focus:ring-orange-250">
+    //                 {isLoading ? "Analyzing..." : "General Analysis"}
+    //             </button>
+    //             <button id="brand-insights" onClick={() => setAnalysisType("brand")} disabled={isLoading} type="submit" className="w-40 py-2 rounded-md text-white font-bold bg-orange-600 hover:bg-orange-400 focus:outline-none focus:ring focus:ring-orange-250">
+    //                 {isLoading ? "Analyzing..." : "Brand Insights"}
+    //             </button>
+    //             <button id="education-trends" onClick={() => setAnalysisType("student")} disabled={isLoading} type="submit" className="w-40 py-2 rounded-md text-white font-bold bg-orange-600 hover:bg-orange-400 focus:outline-none focus:ring focus:ring-orange-250">
+    //                 {isLoading ? "Analyzing..." : "Student Trends"}
+    //             </button> 
+    //         </form>
+
+    //         {searchResults ? <Card analysis={searchResults} />
+    //             : <p className="m-2 p-4 bg-gray-100 rounded-md">Your analysis will appear here once you submit a search.</p>
+    //         }
+    //     </div>
+    // )
+
     return (
         <div>
             <Navbar />
-            <div>
-                <h1 className="font-bold m-2 text-2xl mt-4">Instructions:</h1>
-                <ul className="m-2 p-1 list-disc list-inside">
-                    <li>
-                        Enter a Subreddit name (if you know it) or a search you want to get insights for (e.g., McDonalds for http://www.reddit.com/r/McDonalds, <br/>
-                        or a simple search like &quot;McDonalds value menu&quot;).
-                    </li>
-                    <li>
-                        Click &quot;General Analysis&quot; or, for more tailored insights, select a specific analysis type (&quot;Brand Insights&quot; or &quot;Student Trends&quot;).
-                    </li>
-                    <li>
-                        Reddinsights will perform an AI-powered analysis of top Subreddit posts and replies. <br/>
-                    </li>
-                    <li>
-                        You can save the newly-created Reddinsight to your collection, or click on the &quot;Start a New Analysis&quot; in the navigation to start fresh with a new search.
-                    </li>
-                </ul>
+
+            <div className="max-w-6xl mx-auto px-4 py-6">
+                {/* Instructions */}
+                <section className="mb-8">
+
+                    <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                        <h2 className="font-semibold text-xl mb-3">
+                            Instructions
+                        </h2>
+
+                        <ul className="space-y-3 list-disc list-inside text-gray-700">
+                            <li>
+                                Enter a Subreddit name (if you know it) or a search topic you want to get insights for (e.g., <i>McDonalds</i> for http://www.reddit.com/r/McDonalds, or a simple search like <i>McDonalds value menu</i>).
+                            </li>
+
+                            <li>
+                                Click &quot;General Analysis&quot; or select a specific analysis type for more tailored results (&quot;Brand Insights&quot; or &quot;Student Trends&quot;).
+                            </li>
+
+                            <li>
+                                AI analyzes top Reddit discussions and comments.
+                            </li>
+
+                            <li>
+                                Save the analysis or start a new one anytime.
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                {/* Search Form */}
+                <section className="mb-8">
+                    <form
+                        onSubmit={handleSearchSubmit}
+                        method="post"
+                        className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm"
+                    >
+                        <div className="flex flex-col gap-4">
+
+                            <input
+                                className="w-full border border-gray-300 p-3 rounded-lg"
+                                name="query"
+                                maxLength={40}
+                                required
+                                placeholder="Type a subreddit name or topic (e.g., Target, Amazon)"
+                            />
+
+                            <div className="flex flex-wrap gap-3">
+                                <button
+                                    id="general-analysis"
+                                    onClick={() => setAnalysisType("general")}
+                                    disabled={isLoading}
+                                    type="submit"
+                                    className="px-5 py-2 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500"
+                                >
+                                    {isLoading
+                                        ? "Analyzing..."
+                                        : "General Analysis"}
+                                </button>
+
+                                <button
+                                    id="brand-insights"
+                                    onClick={() => setAnalysisType("brand")}
+                                    disabled={isLoading}
+                                    type="submit"
+                                    className="px-5 py-2 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500"
+                                >
+                                    {isLoading
+                                        ? "Analyzing..."
+                                        : "Brand Insights"}
+                                </button>
+
+                                <button
+                                    id="education-trends"
+                                    onClick={() => setAnalysisType("student")}
+                                    disabled={isLoading}
+                                    type="submit"
+                                    className="px-5 py-2 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500"
+                                >
+                                    {isLoading
+                                        ? "Analyzing..."
+                                        : "Student Trends"}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+
+                {/* Results */}
+                <section>
+                    {searchResults ? (
+                        <Card analysis={searchResults} />
+                    ) : (
+                        <div className="bg-gray-100 rounded-2xl p-6 text-gray-600">
+                            Your analysis will appear here once you submit a search.
+                        </div>
+                    )}
+                </section>
             </div>
-
-            <form onSubmit={handleSearchSubmit} method="post">
-                <input className="w-100 border border-gray-300 m-2 p-2 rounded-md" name="query" placeholder="Type a subreddit name or topic (e.g., Target, Amazon)" />
-
-                <button id="general-analysis" onClick={() => setAnalysisType("general")}disabled={isLoading}  type="submit" className="w-40 py-2 rounded-md text-white font-bold bg-orange-600 hover:bg-orange-400 focus:outline-none focus:ring focus:ring-orange-250">
-                    {isLoading ? "Analyzing..." : "General Analysis"}
-                </button>
-                <button id="brand-insights" onClick={() => setAnalysisType("brand")} disabled={isLoading} type="submit" className="w-40 py-2 rounded-md text-white font-bold bg-orange-600 hover:bg-orange-400 focus:outline-none focus:ring focus:ring-orange-250">
-                    {isLoading ? "Analyzing..." : "Brand Insights"}
-                </button>
-                <button id="education-trends" onClick={() => setAnalysisType("student")} disabled={isLoading} type="submit" className="w-40 py-2 rounded-md text-white font-bold bg-orange-600 hover:bg-orange-400 focus:outline-none focus:ring focus:ring-orange-250">
-                    {isLoading ? "Analyzing..." : "Student Trends"}
-                </button> 
-            </form>
-
-            {searchResults ? <Card analysis={searchResults} />
-                : <p className="m-2 p-4 bg-gray-100 rounded-md">Your analysis will appear here once you submit a search.</p>
-            }
         </div>
-    )
+    );
 }
 
 export default AnalyzerPage
