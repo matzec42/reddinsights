@@ -67,6 +67,7 @@ export async function POST(request: Request) {
 
         /* Reddit API call --- returns an array of comments from the fetched subreddits */
         const redditReplies = await getRedditReplies(fetchedSubreddits, cleanQuery);
+        console.log(`In route.ts, # of comments/Reddit replies fetched: `, redditReplies.length, `Array of replies: `, redditReplies);
         
 
         // **TO-DO**: error handling for empty erray (search was valid/executed b/c subreddits were found and used to query, but no comments were fetched)
