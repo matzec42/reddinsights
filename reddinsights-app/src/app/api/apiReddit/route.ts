@@ -76,8 +76,10 @@ export async function POST(request: Request) {
 
         // FUTURE WORK --- continue improving quality, relevance of fetched comments
         // why? e.g., why can't I get the posts that are on the front page of the /r/Nordstrom1901 (ANSWER: proprietary Reddit thing, regular joes don't get access to the latest & greatest...)
-        // consider tracking/looking at subreddit URLs on fetched replies --> for second API query, prompt it to focus on most relevant and focus on customer sentiment only (not employees, ads, etc.). See Groq AI Docs --> Prompting Guide
-        // expandReplies() to a certain depth perhaps?  means more expensive Reddit calls.
+        // consider tracking/looking at subreddit URLs on fetched replies --> for second API query, prompt it to focus on most relevant and focus on customer sentiment only (not employees, ads, etc.)
+            // see Groq AI Docs --> Prompting Guide
+        // expandReplies() to a certain depth perhaps?  means more expensive Reddit calls
+            // see Snoowrap docs
         // also need to account for popular / hot topics, too many or too long of comment threads -> too many tokens for second Groq call of analysis (array is too large). Limit comments by string length?
         // implement hueristics to select certain number of comments, comment length (not too short, maximum length), or with certain keywords (?) to improve relevance, quality for analysis 
         
@@ -127,7 +129,7 @@ export async function POST(request: Request) {
         const result = {
             success: true,
             message: "Fetch successful",
-            data: parsedFinalAnalysis
+            data: [parsedFinalAnalysis, fetchedSubreddits]
         }
 
         return NextResponse.json(result, { status: 200 });

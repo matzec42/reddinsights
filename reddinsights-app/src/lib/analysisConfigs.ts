@@ -15,15 +15,15 @@ type AnalysisConfig = {
 // TO-DO: experiment with config options (tokens, temperature) for the differents types; simplify/reduce directions without sacrificing quality of AI output; even try different models
     // using more efficient model (8b-instant) for the basic task of finding subreddits --- less expensive
     // using more powerful model (70b-versatile) for the actual analysis of the comments --- more expensive, but want higher quality output for the analysis
-// TO-DO: along with frontend (AnazlyerPage --> Card), debug the date stamp (inaccurate)
+// FUTURE WORK: explore 
 
 export const analysisConfigs: Record<string, AnalysisConfig> = {
     /* General Analysis Config */
     general: {
         subredditPrompt: (query) => `
-            Find 5 public Reddit communities that are most likely to have detailed, first-hand user discussions and opinions about ${query}. Prioritize communities where:
+            Find 5 public Reddit communities that are most likely to have detailed, first-hand user discussions about ${query}. Prioritize communities where:
                 - Most posts are user-generated (not news or memes).
-                - Posts focus on customer reviews, experiences and sentiments.
+                - Posts focus on user opinions, experiences and sentiments.
                 - The community is active (recent posts within the last month).
             If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid NSFW, off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"]
         `,
@@ -39,7 +39,7 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             Return JSON with keys:
                 {
                     analysisTitle: string,
-                    createdAt: new Date(),
+                    createdAt: ${new Date()},
                     commentCount: number,
                     generalSummary: string,
                     sentimentSummary: {
@@ -78,7 +78,7 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             return `
             You are a brand analyst.
 
-            Analyze customer perception of "${query}" using: ${promptData}.
+            Analyze customer discussions and perception of "${query}" using: ${promptData}.
 
             Focus on:
             - brand sentiment
@@ -89,7 +89,7 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             Return JSON with keys:
                 {
                     analysisTitle: string,
-                    createdAt: new Date(),
+                    createdAt: ${new Date()},
                     commentCount: number,
                     generalSummary: string,
                     sentimentSummary: {
@@ -126,9 +126,7 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
         analysisPrompt: (query, data) => {
             const promptData = Array.isArray(data) ? data.join("\n\n---\n\n") : data;
             return `
-        You are a sentiment analyst.
-
-            Analyze student perception and disucssion of "${query}" using: ${promptData}.
+            Analyze student discussions and perceptions of "${query}" using: ${promptData}.
 
             Focus on:
             - student experiences
@@ -139,7 +137,7 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             Return JSON with keys:
                 {
                     analysisTitle: string,
-                    createdAt: new Date(),
+                    createdAt: ${new Date()},
                     commentCount: number,
                     generalSummary: string,
                     sentimentSummary: {

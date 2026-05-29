@@ -7,6 +7,7 @@ import { useState } from 'react';
 const AnalyzerPage: React.FunctionComponent = () => {
     // state for search results
     const [searchResults, setSearchResults] = useState(null);
+    const [subreddits, setSubreddits] = useState<string[]>([]);
     const [analysisType, setAnalysisType] = useState("general");
     const [isLoading, setIsLoading] = useState(false);
 
@@ -47,8 +48,10 @@ const AnalyzerPage: React.FunctionComponent = () => {
                 return alert(`${fetchedAnalysis.message}. Please try another Analysis with an existing Subreddit.`)
             }
 
-            console.log("Fetched analysis:", fetchedAnalysis.data);
-            setSearchResults(fetchedAnalysis.data);
+            console.log("Fetched analysis:", fetchedAnalysis.data[0]);
+            console.log("Fetched subreddits:", fetchedAnalysis.data[1]);
+            setSearchResults(fetchedAnalysis.data[0]);
+            setSubreddits(fetchedAnalysis.data[1]);
 
         } catch (err) {
             console.error("Error fetching analysis", err);
@@ -197,7 +200,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
                 {/* Results */}
                 <section>
                     {searchResults ? (
-                        <Card analysis={searchResults} />
+                        <Card analysis={searchResults} subreddits={subreddits} />
                     ) : (
                         <div className="bg-gray-100 rounded-2xl p-6 text-gray-600">
                             Your analysis will appear here once you submit a search.

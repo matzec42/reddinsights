@@ -2,7 +2,7 @@
 
 export interface Analysis {
     analysisTitle: string;
-    createdAt: Date
+    createdAt: Date;
     commentCount: number;
     generalSummary: string;
     sentimentSummary: {
@@ -15,5 +15,6 @@ export interface Analysis {
 }
 
 export interface CardProps {
-    analysis: Analysis;
+    analysis: Analysis,
+    subreddits: string[];
 }
