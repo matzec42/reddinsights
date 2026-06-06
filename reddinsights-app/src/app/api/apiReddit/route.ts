@@ -43,7 +43,7 @@ export async function POST(request: Request) {
         });
 
         // type safety --- parse the fetched Listing of subreddit titles
-        // TO-DO: additional defensive parsing (formatting can be incosistent)
+        // TO-DO: additional defensive parsing (formatting can be inconsistent)
         let fetchedSubreddits: string[] = [];
 
         try {

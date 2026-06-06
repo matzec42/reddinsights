@@ -27,7 +27,7 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
                     time: "month",
                 });
 
-            // copy Listing in brackets to make it an iterable array
+            // copy Listing to make it an iterable array
             for (const post of [...listing]) {
                 if (post.selftext && post.selftext.trim() !== "") {
                     // console.log(`Post from r/${sub}:`, post.title);
