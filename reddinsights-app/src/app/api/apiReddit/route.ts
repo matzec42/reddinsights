@@ -30,9 +30,11 @@ export async function POST(request: Request) {
 
 
         // sanitize the query (e.g., no apostrophes). subreddits only contain letters, numbers and underscores
-        const cleanQuery = query.trim().replace(/[^a-zA-Z0-9_-]/g, "");
+        // Reddit's API --- + symbol is valid search query format
+        // const cleanQuery = query.trim().replace(/[^a-zA-Z0-9_-]/g, "");
+        const cleanQuery = query.trim().replace(/[^a-zA-Z0-9_\- ]/g, "").replace(/\s+/g, "+");
 
-    
+
         /* First AI API call --- cheap call to fetch relevant subreddit titles */
         // Groq API call (returns a JSON string)
         const subredditList = await groqCall({
@@ -43,11 +45,16 @@ export async function POST(request: Request) {
         });
 
         // type safety --- parse the fetched Listing of subreddit titles
-        // TO-DO: additional defensive parsing (formatting can be inconsistent)
+        // additional defensive parsing (formatting can be inconsistent)
         let fetchedSubreddits: string[] = [];
 
         try {
-            fetchedSubreddits = JSON.parse(subredditList);
+            // fetchedSubreddits = JSON.parse(subredditList);
+            // console.log("Parsed subreddit list:", fetchedSubreddits);
+            const extracted = subredditList.match(/"([^"\n]+)"/g);
+            const rawSubreddits = extracted ? extracted.map(s => s.replace(/"/g, '').replace(/\s+/g, '')) : [];
+            // edge case handling --- prevents runaway generation (an LLM failure --- the llama model that fetches subreddits has done this)
+            fetchedSubreddits = [...new Set(rawSubreddits)].slice(0, 5);
             console.log("Parsed subreddit list:", fetchedSubreddits);
         } catch (err) {
             console.error("Failed to parse subreddit response:", subredditList, {
@@ -59,39 +66,51 @@ export async function POST(request: Request) {
                 raw: subredditList
             }, { status: 500 });
         }
-        
+
         // **TO-DO**: edge case / error handling for empty array (no relevant subreddits found) ... after the first prompt, it's possible it could be empty
-            // early exit and response here --- avoids Reddit fetch, second AI API analysis call
-            // on frontend, a message to try a new search to yield results
+        // early exit and response here --- avoids Reddit fetch, second AI API analysis call
+        // on frontend, a message to try a new search to yield results
 
 
         /* Reddit API call --- returns an array of comments from the fetched subreddits */
         const redditReplies = await getRedditReplies(fetchedSubreddits, cleanQuery);
-        console.log(`In route.ts, # of comments/Reddit replies fetched: `, redditReplies.length, `Array of replies: `, redditReplies);
-        
+        console.log(`Number of comments/Reddit replies fetched: `, redditReplies.length);
 
-        // **TO-DO**: error handling for empty erray (search was valid/executed b/c subreddits were found and used to query, but no comments were fetched)
-            //early exit and response here --- avoids second AI API analysis call
-            // on frontend, a message and re-prompt user (frontend)
+        // error handling for empty array (search was valid/executed b/c subreddits were found and used to query, but no comments were fetched)
+        // message on response object gets rendered on frontend
+        if (redditReplies.length === 0) {
+            return NextResponse.json({
+                success: false,
+                message: "No Reddit posts found. Try modifying your search term(s) or using a different mode (e.g., General)."
+            }, { status: 404 });
+        }
+        // edge case --- insufficient comments in array (AI will hallucinate otherwise)
+        if (redditReplies.length < 3) {
+            return NextResponse.json({
+                success: false,
+                message: "Not enough Reddit posts found for a reliable analysis. Try modifying your search term(s) or using a different mode (e.g., General)."
+            }, { status: 404 });
+        }
 
 
-        // FUTURE WORK --- continue improving quality, relevance of fetched comments
+        // **FUTURE WORK** --- continue improving quality, relevance of fetched comments --> improve sentiment analysis
         // why? e.g., why can't I get the posts that are on the front page of the /r/Nordstrom1901 (ANSWER: proprietary Reddit thing, regular joes don't get access to the latest & greatest...)
+        // see Groq AI Docs --> Prompting Guide
         // consider tracking/looking at subreddit URLs on fetched replies --> for second API query, prompt it to focus on most relevant and focus on customer sentiment only (not employees, ads, etc.)
-            // see Groq AI Docs --> Prompting Guide
-        // expandReplies() to a certain depth perhaps?  means more expensive Reddit calls
+        // **KEY** --- current Reddit fetching only captures post selftext, misses much of discussion which lives in comment threads
+            // look into implementing expandReplies() in reddit-api-helper (see lib folder) to a certain depth perhaps? means more expensive Reddit calls but worth it
             // see Snoowrap docs
-        // also need to account for popular / hot topics, too many or too long of comment threads -> too many tokens for second Groq call of analysis (array is too large). Limit comments by string length?
-        // implement hueristics to select certain number of comments, comment length (not too short, maximum length), or with certain keywords (?) to improve relevance, quality for analysis 
-        
+        // implemented hueristics to select certain number of comments, comment length (not too short, maximum length),
+        // or with certain keywords (?) to improve relevance, quality for analysis (see below)
 
-        /* Structured Compression --- Filtering/Normalizing (.filter), Capping (.slice), Formatting (.map w/ .join) */
-        // see utils folder for this --- consider modifying for comment quality, length, etc. (also shuffling for )
+
+        /* Structured Compression --- filtering/normalizing for length (.filter), capping array size (.slice), formatting for the LLM (.map w/ .join) */
         const formattedReplies = redditReplies
-            .filter(r => typeof r === "string" && r.trim().length > 20)
+            .filter(r => typeof r === "string" && r.trim().length > 20 && r.trim().length < 2000)
             .slice(0, config.maxComments)
-            .map((r, i) => `Comment ${i + 1}: ${r.trim()}`)
+            .map((r, i) => `Comment ${i + 1}: ${r.trim().slice(0, 1500)}`)
             .join("\n\n---\n\n");
+        console.log(`Formatted Reddit comments/replies: ${formattedReplies}`);
 
 
         /* Second AI API call --- Sentiment Analysis (returns a JSON object with analysis results) */
@@ -114,11 +133,12 @@ export async function POST(request: Request) {
         // console.log("Cleaned analysis string:", cleanedAnalysis);
 
         // final parsing analysis
-        // NOTE: parse error can occur because of incomplete/truncated string (i.e., if it's too long). Manage by:
-            // adjusting maxTokens in the Groq API call (see utils/groq-api-helpers.ts)
+        // NOTE: parse error can occur because of incomplete/truncated string (i.e., if it's too long).
+        // mitigate by:
+            // adjusting maxTokens in the Groq API call (see lib/groq-api-helpers.ts)
             // adjust # of comments in formattedReplies (see config.maxComments in lib/analysisConfigs.ts)
             // adjust/limit length of comments in the formatting step above (e.g., .slice(0, config.maxComments)
-            // or filter out longer comments in the .filter step)
+            // see both .trim methods in the .filter and .map steps
         const parsedFinalAnalysis = JSON.parse(cleanedAnalysis);
         console.log("Parsed analysis object:", parsedFinalAnalysis);
 

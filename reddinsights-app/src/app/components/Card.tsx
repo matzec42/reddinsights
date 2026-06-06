@@ -34,7 +34,7 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
                     <p className="font-semibold mb-1">Summary</p>
                     <p className="text-gray-700 mb-6">{analysis.generalSummary}</p>
                     <p className="font-semibold mb-2">Overall Sentiment: {analysis.sentimentSummary.overall.charAt(0).toUpperCase() + analysis.sentimentSummary.overall.slice(1)}</p>
-                    <PieChart width={300} height={250}>
+                    <PieChart width={400} height={300}>
                         <Pie
                             data={sentimentData}
                             cx={140}
@@ -63,7 +63,7 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
                             </li>
                         ))}
                     </ul>
-                    <p className="font-semibold mb-2">Subreddit Sources</p>
+                    <p className="font-semibold mb-2">Subreddit Sources:</p>
                     <ul className="space-y-1 list-disc list-inside">
                         {subreddits.map((sub: string, index: number) => (
                             <li key={index}>

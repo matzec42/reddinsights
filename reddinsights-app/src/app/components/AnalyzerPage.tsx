@@ -10,6 +10,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
     const [subreddits, setSubreddits] = useState<string[]>([]);
     const [analysisType, setAnalysisType] = useState("general");
     const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 
     // handleSearchSubmit function for user's search term (POST)
@@ -23,33 +24,24 @@ const AnalyzerPage: React.FunctionComponent = () => {
         setIsLoading(true);
 
         try {
-            // error handling --- missing search term, response not OK
             if (!searchTerm.trim()) {
-                console.error("Invalid search term")
-                alert("Please submit a term to search.");
+                setErrorMessage("Please submit a valid search term.");
                 return;
             }
-            // fetch for RedditAPI
+
             const response = await fetch('/api/apiReddit', {
                 method: "POST",
-                // credentials: include,                        // uncomment when sessions, cookies are set up
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ query: searchTerm, type: type })
-            })
+            });
 
-            // error handling for bad response
-            if (!response.ok) throw new Error("Something went wrong---unable to retrieve Insights.");
-
-            // parse response from /api/apiReddit/route.ts
             const fetchedAnalysis = await response.json();
 
-            if (!fetchedAnalysis.data) {
-                console.error(`${fetchedAnalysis.message}`)
-                return alert(`${fetchedAnalysis.message}. Please try another Analysis with an existing Subreddit.`)
+            if (!response.ok || !fetchedAnalysis.data) {
+                setErrorMessage(fetchedAnalysis.message || "Something went wrong. Please try again.");
+                setSearchResults(null);
+                return;
             }
-
-            console.log("Fetched analysis:", fetchedAnalysis.data[0]);
-            console.log("Fetched subreddits:", fetchedAnalysis.data[1]);
             setSearchResults(fetchedAnalysis.data[0]);
             setSubreddits(fetchedAnalysis.data[1]);
 
@@ -125,7 +117,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
                             </li>
 
                             <li>
-                                Click &quot;General Analysis&quot; or select a specific analysis type for more tailored results (&quot;Brand Insights&quot; or &quot;Student Trends&quot;).
+                                Click &quot;General Analysis&quot; or select a specific analysis mode for more tailored results (&quot;Brand Insights&quot; or &quot;Student Trends&quot;).
                             </li>
 
                             <li>
@@ -134,6 +126,9 @@ const AnalyzerPage: React.FunctionComponent = () => {
 
                             <li>
                                 Save the analysis or start a new one anytime.
+                            </li>
+                            <li>
+                                NOTE: if a search doesn&apos;t return an analysis, experiment with different terms or one of the other search modes.
                             </li>
                         </ul>
                     </div>
@@ -201,6 +196,10 @@ const AnalyzerPage: React.FunctionComponent = () => {
                 <section>
                     {searchResults ? (
                         <Card analysis={searchResults} subreddits={subreddits} />
+                    ) : errorMessage ? (
+                        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-red-600">
+                            {errorMessage}
+                        </div>
                     ) : (
                         <div className="bg-gray-100 rounded-2xl p-6 text-gray-600">
                             Your analysis will appear here once you submit a search.
