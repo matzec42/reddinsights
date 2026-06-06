@@ -25,7 +25,7 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
                 - Most posts are user-generated (not news or memes).
                 - Posts focus on user opinions, experiences and sentiments.
                 - The community is active (recent posts within the last month).
-            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid NSFW, off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"]
+            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid off-topic or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"]
         `,
 
         analysisPrompt:(query, data) => {
@@ -69,7 +69,7 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
                 - Most posts are user-generated (not news or memes).
                 - Posts focus mostly on customer reviews, product reviews, complaints, comparisons.
                 - The community is active (recent posts within the last month).
-            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid NSFW, off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"].
+            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"].
             Return ONLY JSON array.
         `,
 
@@ -119,7 +119,7 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
                 - Most posts are user-generated (not news or memes).
                 - Posts focus mostly on customer reviews, product reviews, complaints, comparisons.
                 - The community is active (recent posts within the last month).
-            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid NSFW, off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"].
+            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"].
             Return ONLY JSON array.
         `,
 

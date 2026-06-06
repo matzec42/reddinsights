@@ -27,8 +27,12 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
                     time: "month",
                 });
 
+            const postsArray = [...listing];
+            console.log(`r/${sub}: ${postsArray.length} posts found`);
+
             // copy Listing to make it an iterable array
-            for (const post of [...listing]) {
+            for (const post of postsArray) {
+                // console.log(`Post: ${post.title} | selftext length: ${post.selftext?.length}`);
                 if (post.selftext && post.selftext.trim() !== "") {
                     // console.log(`Post from r/${sub}:`, post.title);
                     allReplies.push(post.selftext);
@@ -45,13 +49,18 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
             continue;
         }
     }
+
+    console.log(`Total replies collected: ${allReplies.length}`)
     return allReplies
 };
 
 // **FUTURE WORK:** various options for how to query Reddit API ---  Snoowrap functions (getTop w/ a time option) to fetch Top or Hot comments for threads.
-    // Consider experimenting with different options for fetching comments (e.g., top vs hot, time range) to see how it impacts the quality of the insights.
-    // For example, top comments from the past month could have more relevant insights than hot comments from all time,
-    // which could be dominated by older posts with lots of upvotes.
-    // Could implement as an additional option in the frontend for users to select their preferred comment fetching strategy.
+// **KEY** --- current Reddit fetching only captures post selftext, misses much of discussion which lives in comment threads!
+// look into implementing expandReplies() in reddit-api-helper (see lib folder) to a certain depth perhaps? means more expensive Reddit calls but worth it
+    // see Snoowrap docs
+// Consider experimenting with different options for fetching comments (e.g., top vs hot, time range) to see how it impacts the quality of the insights.
+// For example, top comments from the past month could have more relevant insights than hot comments from all time,
+// which could be dominated by older posts with lots of upvotes.
+// Could implement as an additional option in the frontend for users to select their preferred comment fetching strategy.
 
 // Since comments will be fetched, future work could also include sending them if user requests (e.g., "Click to see comments fetched" so that they can get a sense of quality and modify their next search accordingly)
