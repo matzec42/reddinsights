@@ -53,51 +53,6 @@ const AnalyzerPage: React.FunctionComponent = () => {
         }
     }
 
-    // TO-DO: fix bug to pass props to Card.tsx (TS error). Related to how JSON object gets returned from backend (as a string/markdown coded block)
-    // Prompt modifying on backend does not fix it, may need to implement a parsing function in API
-
-    // return (
-    //     <div className="max-w-6xl mx-auto px-4 py-6">
-    //         <Navbar />
-    //         <div>
-    //             <h1 className="font-bold m-2 text-2xl mt-4">Instructions:</h1>
-    //             <ul className="m-2 p-1 list-disc list-inside">
-    //                 <li>
-    //                     Enter a Subreddit name (if you know it) or a search topic you want to get insights for (e.g., McDonalds for http://www.reddit.com/r/McDonalds, <br/>
-    //                     or a simple search like &quot;McDonalds value menu&quot;).
-    //                 </li>
-    //                 <li>
-    //                     Click &quot;General Analysis&quot; or, for more tailored insights, select a specific analysis type (&quot;Brand Insights&quot; or &quot;Student Trends&quot;).
-    //                 </li>
-    //                 <li>
-    //                     Reddinsights will perform an AI-powered analysis of top Reddit discussions and comments. <br/>
-    //                 </li>
-    //                 <li>
-    //                     Save the analysis to your collection, or click on the &quot;Start a New Analysis&quot; in the navigation to start fresh with a new one.
-    //                 </li>
-    //             </ul>
-    //         </div>
-
-    //         <form onSubmit={handleSearchSubmit} method="post">
-    //             <input className="w-100 border border-gray-300 m-2 p-2 rounded-md" name="query" maxLength={30} required placeholder="Type a subreddit name or topic (e.g., Target, Amazon)" />
-
-    //             <button id="general-analysis" onClick={() => setAnalysisType("general")}disabled={isLoading}  type="submit" className="w-40 py-2 rounded-md text-white font-bold bg-orange-600 hover:bg-orange-400 focus:outline-none focus:ring focus:ring-orange-250">
-    //                 {isLoading ? "Analyzing..." : "General Analysis"}
-    //             </button>
-    //             <button id="brand-insights" onClick={() => setAnalysisType("brand")} disabled={isLoading} type="submit" className="w-40 py-2 rounded-md text-white font-bold bg-orange-600 hover:bg-orange-400 focus:outline-none focus:ring focus:ring-orange-250">
-    //                 {isLoading ? "Analyzing..." : "Brand Insights"}
-    //             </button>
-    //             <button id="education-trends" onClick={() => setAnalysisType("student")} disabled={isLoading} type="submit" className="w-40 py-2 rounded-md text-white font-bold bg-orange-600 hover:bg-orange-400 focus:outline-none focus:ring focus:ring-orange-250">
-    //                 {isLoading ? "Analyzing..." : "Student Trends"}
-    //             </button> 
-    //         </form>
-
-    //         {searchResults ? <Card analysis={searchResults} />
-    //             : <p className="m-2 p-4 bg-gray-100 rounded-md">Your analysis will appear here once you submit a search.</p>
-    //         }
-    //     </div>
-    // )
-
     return (
         <div>
             <Navbar />
@@ -174,6 +129,18 @@ const AnalyzerPage: React.FunctionComponent = () => {
                                     {isLoading
                                         ? "Analyzing..."
                                         : "Brand Insights"}
+                                </button>
+
+                                <button
+                                    id="trending-topics"
+                                    onClick={() => setAnalysisType("trending")}
+                                    disabled={isLoading}
+                                    type="submit"
+                                    className="px-5 py-2 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500"
+                                >
+                                    {isLoading
+                                        ? "Analyzing..."
+                                        : "Trending Topics"}
                                 </button>
 
                                 <button

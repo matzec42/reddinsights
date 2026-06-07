@@ -5,9 +5,18 @@ import { groqCall } from '@/lib/groq-api-helpers';
 import { analysisConfigs } from "@/lib/analysisConfigs";
 import { getRedditReplies } from "@/lib/reddit-api-helper";
 
+// simple in-memory caching
+// replace w/ DB caching (MongoDB)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const cache = new Map<string, { data: any, timestamp: number }>();
+const CACHE_TTL = 1000 * 60 * 60;
+
 
 // Function to query the RedditAPI, perform AI analysis
 export async function POST(request: Request) {
+    // dev only --- for checking response time of new analysis vs. fetching cached data
+    const startTime = Date.now();
+
     try {
         // parse the req body
         const body = await request.json();
@@ -30,9 +39,18 @@ export async function POST(request: Request) {
 
 
         // sanitize the query (e.g., no apostrophes). subreddits only contain letters, numbers and underscores
-        // Reddit's API --- + symbol is valid search query format
+        // for Reddit's API, + symbol is valid search query format (e.g., query of "McDonalds value menu" --> mcdonalds+value+menu)
         // const cleanQuery = query.trim().replace(/[^a-zA-Z0-9_-]/g, "");
         const cleanQuery = query.trim().replace(/[^a-zA-Z0-9_\- ]/g, "").replace(/\s+/g, "+");
+
+        /* Cache Check (in-memory, temporary until DB version is set up) */
+        // caching --- create key (clean query + analysis type)
+        const cacheKey = `${cleanQuery}-${type}`;
+        const cached = cache.get(cacheKey);
+        if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+            console.log(`Cache hit for: ${cacheKey} | Response time: ${Date.now() - startTime}ms`);
+            return NextResponse.json({ success: true, message: "Fetch successful", data: cached.data });
+        }
 
 
         /* First AI API call --- cheap call to fetch relevant subreddit titles */
@@ -98,13 +116,12 @@ export async function POST(request: Request) {
         // see Groq AI Docs --> Prompting Guide
         // consider tracking/looking at subreddit URLs on fetched replies --> for second API query, prompt it to focus on most relevant and focus on customer sentiment only (not employees, ads, etc.)
         // **KEY** --- current Reddit fetching only captures post selftext, misses much of discussion which lives in comment threads
-            // look into implementing expandReplies() in reddit-api-helper (see lib folder) to a certain depth perhaps? means more expensive Reddit calls but worth it
-            // see Snoowrap docs
-        // implemented hueristics to select certain number of comments, comment length (not too short, maximum length),
-        // or with certain keywords (?) to improve relevance, quality for analysis (see below)
+        // look into implementing expandReplies() in reddit-api-helper (see lib folder) to a certain depth; means more expensive Reddit calls but worth it
+        // see notes in /lib/reddit-api-helper !!!
 
 
         /* Structured Compression --- filtering/normalizing for length (.filter), capping array size (.slice), formatting for the LLM (.map w/ .join) */
+        // implemented hueristics to select certain # of comments, control comment length (not too short, max length)
         const formattedReplies = redditReplies
             .filter(r => typeof r === "string" && r.trim().length > 20 && r.trim().length < 2000)
             .slice(0, config.maxComments)
@@ -135,10 +152,10 @@ export async function POST(request: Request) {
         // final parsing analysis
         // NOTE: parse error can occur because of incomplete/truncated string (i.e., if it's too long).
         // mitigate by:
-            // adjusting maxTokens in the Groq API call (see lib/groq-api-helpers.ts)
-            // adjust # of comments in formattedReplies (see config.maxComments in lib/analysisConfigs.ts)
-            // adjust/limit length of comments in the formatting step above (e.g., .slice(0, config.maxComments)
-            // see both .trim methods in the .filter and .map steps
+        // adjusting maxTokens in the Groq API call (see lib/groq-api-helpers.ts)
+        // adjust # of comments in formattedReplies (see config.maxComments in lib/analysisConfigs.ts)
+        // adjust/limit length of comments in the formatting step above (e.g., .slice(0, config.maxComments)
+        // see both .trim methods in the .filter and .map steps
         const parsedFinalAnalysis = JSON.parse(cleanedAnalysis);
         console.log("Parsed analysis object:", parsedFinalAnalysis);
 
@@ -153,9 +170,15 @@ export async function POST(request: Request) {
             data: [parsedFinalAnalysis, fetchedSubreddits]
         }
 
+        // save finished result of full pipeline run to cache
+        cache.set(cacheKey, { data: [parsedFinalAnalysis, fetchedSubreddits], timestamp: Date.now() });
+
+        console.log(`Full pipeline for: ${cacheKey} | Response time: ${Date.now() - startTime}ms`);
+        
         return NextResponse.json(result, { status: 200 });
 
     } catch (error) {
+        console.log(`Error after: ${Date.now() - startTime}ms`);
         console.error("Error in the RedditAPI route:", error);
 
         return NextResponse.json({
