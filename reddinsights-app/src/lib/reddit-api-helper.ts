@@ -13,6 +13,9 @@ const redditRequest = new snoowrap({
 // to avoid type issues with Listing returns from Reddit API
 redditRequest.config({ proxies: false });
 
+// variable for comment extraction --- fine tune it depending on comment quality
+const MAX_COMMENTS_PER_POST = 7;
+
 
 export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: string) => {
     const allReplies: Array<string> = [];
@@ -27,18 +30,38 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
                     time: "month",
                 });
 
+            // copy Listing to make it an iterable array
             const postsArray = [...listing];
             console.log(`r/${sub}: ${postsArray.length} posts found`);
 
-            // copy Listing to make it an iterable array
             for (const post of postsArray) {
                 // console.log(`Post: ${post.title} | selftext length: ${post.selftext?.length}`);
                 if (post.selftext && post.selftext.trim() !== "") {
                     // console.log(`Post from r/${sub}:`, post.title);
                     allReplies.push(post.selftext);
                 }
+
+                // capture top comments (try/catch and console.warn so it doesn't kill the whole loop)
+                // suppressing the eslint rule against using any type here --- Snoowrap TS types are throwing errors (a known problem w/ the library)
+                try {
+                        // fetch top-level comments --- consider expanding if it would capture sentiment better / improve analysis quality
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const comments = await (post.expandReplies({ depth: 2, limit: MAX_COMMENTS_PER_POST }) as any);
+                        const topComments = comments.comments
+                            .slice(0, MAX_COMMENTS_PER_POST)
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            .filter((comment: any) => comment.body && comment.body.trim() !== "")
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            .sort((a: any, b: any) => b.score - a.score);
+    
+                        for (const comment of topComments) {
+                            allReplies.push(comment.body);
+                        }
+                    } catch (err) {
+                        console.warn(`Could not expand comments for post ${post.id}:`, err instanceof Error ? err.message : err);
+                    }
             }
-        
+
         } catch (err) {
             // for private, banned or removed/non-existent Subreddits (getting 403, 404 errors)
             if (err instanceof Error) {
@@ -50,17 +73,12 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
         }
     }
 
-    console.log(`Total replies collected: ${allReplies.length}`)
     return allReplies
 };
 
-// **FUTURE WORK:** various options for how to query Reddit API ---  Snoowrap functions (getTop w/ a time option) to fetch Top or Hot comments for threads.
-// **KEY** --- current Reddit fetching only captures post selftext, misses much of discussion which lives in comment threads!
-// look into implementing expandReplies() in reddit-api-helper (see lib folder) to a certain depth perhaps? means more expensive Reddit calls but worth it
-    // see Snoowrap docs
-// Consider experimenting with different options for fetching comments (e.g., top vs hot, time range) to see how it impacts the quality of the insights.
-// For example, top comments from the past month could have more relevant insights than hot comments from all time,
-// which could be dominated by older posts with lots of upvotes.
-// Could implement as an additional option in the frontend for users to select their preferred comment fetching strategy.
-
-// Since comments will be fetched, future work could also include sending them if user requests (e.g., "Click to see comments fetched" so that they can get a sense of quality and modify their next search accordingly)
+// **FUTURE WORK:** explore various options for how to query Reddit API ---  Snoowrap functions (getTop w/ a time option) to fetch Top or Hot comments for threads
+// Create a "Trending Topics" mode: sort comments by "new" instead of "top" to capture fast-moving sentiment
+// Upvote threshold --- filter out comments below a minimum score to improve quality
+// Keyword relevance scoring to prioritize comments that contain the search query terms
+// Expose fetched comments to the user on the frontend so they can assess quality and refine their search
+    // (e.g., "Click to see comments fetched" so that they can get a sense of quality and modify their next search accordingly)
