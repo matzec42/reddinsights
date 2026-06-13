@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import { ReddinsightsSchema } from "./models";
 // import { cookies } from "next/dist/server/request/cookies";
 import { cookies } from "next/headers";
+import mongoose from "mongoose";
 
 
 const SALT_ROUNDS = 10;
@@ -17,7 +18,7 @@ export async function comparePasswords(password: string, hashedPassword: string)
 }
 
 // function to create session 
-export async function createSession(userId: string): Promise<string> {
+export async function createSession(userId: mongoose.Types.ObjectId): Promise<string> {
     const sessionToken = crypto.randomUUID();
     // console.log("Generated session token:", sessionToken);
 

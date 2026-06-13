@@ -1,4 +1,3 @@
-import { create } from "domain";
 import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -27,14 +26,12 @@ const sessionSchema = new Schema({
     createdAt: { type: Date, default: Date.now, expires: '1d' } // Session expires after 1 day
 });
 
-const threadSchema = new Schema({
-    userId: { type: Schema.Types.ObjectId, ref: "User" },
-    redditUrl: { type: String, required: true },
-    subreddit: String,
+const analysisSchema = new Schema({
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     postTitle: String,
-    fetchedAt: Date,
     commentCount: Number,
     sentimentSummary: {
+        overall: String,
         positive: Number,
         negative: Number,
         neutral: Number,
@@ -47,12 +44,12 @@ const threadSchema = new Schema({
     topThemes: [
         { label: String, quote: String }
     ],
-    rawPromptToken: Number,
-    createdAt: Date
+    createdAt: Date,
+    subreddits: [{ type: String }]
 });
 
 const commentSchema = new Schema({
-    threadId: { type: Schema.Types.ObjectId, ref: "Thread", required: true },
+    analysisId: { type: Schema.Types.ObjectId, ref: "Analysis", required: true },
     commentId: String,
     author: String,
     content: String,
@@ -63,10 +60,10 @@ const commentSchema = new Schema({
 
 const cardSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    threadId: { type: Schema.Types.ObjectId, ref: "Thread" },
+    analysisId: { type: Schema.Types.ObjectId, ref: "Analysis" },
     displayName: String,
     createdAt: { type: Date, default: Date.now },
-    // for cards --- some repetition of Thread, but idea is to have user access past analyses/snaphots of threads
+    // for cards --- some repetition of Analysis, but idea is to have user access past analyses/snaphots of analyses
     snapshot: {
         subreddit: String,
         postTitle: String,
@@ -87,8 +84,8 @@ const cardSchema = new Schema({
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 const Session = mongoose.models.Session || mongoose.model("Session", sessionSchema);
-const Thread = mongoose.models.Thread || mongoose.model("Thread", threadSchema);
+const Analysis = mongoose.models.Analysis || mongoose.model("Analysis", analysisSchema);
 const Comment = mongoose.models.Comment || mongoose.model("Comment", commentSchema);
 const Card = mongoose.models.Card || mongoose.model("Card", cardSchema);
 
-export const ReddinsightsSchema = { User, Session, Thread, Comment, Card }
+export const ReddinsightsSchema = { User, Session, Analysis, Comment, Card }

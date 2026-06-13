@@ -74,9 +74,9 @@ export async function POST(request: Request) {
             // edge case handling --- prevents runaway generation (an LLM failure --- the llama model that fetches subreddits has done this)
             fetchedSubreddits = [...new Set(rawSubreddits)].slice(0, 5);
             console.log("Parsed subreddit list:", fetchedSubreddits);
-        } catch (err) {
+        } catch (error) {
             console.error("Failed to parse subreddit response:", subredditList, {
-                error: err,
+                error: error,
                 raw: subredditList
             });
             return NextResponse.json({
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
         // **FUTURE WORK** --- continue improving quality, relevance of fetched comments --> improve sentiment analysis
         // why? e.g., why can't I get the posts that are on the front page of the /r/Nordstrom1901 (ANSWER: proprietary Reddit thing, regular joes don't get access to the latest & greatest...)
         // see Groq AI Docs --> Prompting Guide
-        // consider tracking/looking at subreddit URLs on fetched replies --> for second API query, prompt it to focus on most relevant and focus on customer sentiment only (not employees, ads, etc.)
+        // consider tracking/looking at subreddit URLs on fetched replies --> for second API query, prompt to focus on most relevant & focus on customer sentiment only (not employees, ads, etc.)
         // **KEY** --- current Reddit fetching only captures post selftext, misses much of discussion which lives in comment threads
         // look into implementing expandReplies() in reddit-api-helper (see lib folder) to a certain depth; means more expensive Reddit calls but worth it
         // see notes in /lib/reddit-api-helper !!!

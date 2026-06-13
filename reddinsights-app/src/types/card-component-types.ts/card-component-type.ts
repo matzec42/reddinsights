@@ -1,6 +1,6 @@
 // card-component-type.ts
 
-export interface Analysis {
+export interface AnalysisType {
     analysisTitle: string;
     createdAt: Date;
     commentCount: number;
@@ -15,6 +15,6 @@ export interface Analysis {
 }
 
 export interface CardProps {
-    analysis: Analysis,
+    analysis: AnalysisType,
     subreddits: string[];
 }

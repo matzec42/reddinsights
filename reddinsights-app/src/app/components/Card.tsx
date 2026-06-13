@@ -10,11 +10,41 @@ const COLORS = ['#4bb94d', '#d50101', '#47b7f5'];
 
 const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
 
+    // state for saving functionality --- useState hook not needed, as data is static and passed down as props
+    // re-assigning to variables for handleSave function to access
+    const analysisData = analysis;
+    const subredditsData = subreddits;
+    // assigning sentiment data for visualization
     const sentimentData = [
         { name: 'Positive', value: analysis.sentimentSummary.positive },
         { name: 'Negative', value: analysis.sentimentSummary.negative },
         { name: 'Neutral', value: analysis.sentimentSummary.neutral },
     ];
+
+
+    const handleSaveAnalysis = async () => {
+        const payload = { analysis: analysisData, subreddits: subredditsData, visualization: sentimentData };
+
+        try {
+            const response = await fetch('/api/save-analysis', {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                alert("Failed to save analysis. Please try again.");
+                return;
+            }
+
+            alert("Analysis saved successfully!");
+
+        } catch (err) {
+                console.error("Error saving analysis", err);
+                alert("Something went wrong while trying to save your analysis. Please try again.");
+        }
+    }
+
 
     return (
         <div className="p-6 bg-white border border-gray-200 rounded-2xl shadow-lg">
@@ -50,6 +80,7 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
                         <Tooltip />
                         <Legend />
                     </PieChart>
+                    <button id="save-analysis" onClick={() => handleSaveAnalysis()} className="px-5 py-2 mt-10 ml-5 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500">Save These Reddinsights</button>
                 </div>
 
                 {/* Right: Top Themes, subreddit Links */}
