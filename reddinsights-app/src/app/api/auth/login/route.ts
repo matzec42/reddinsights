@@ -30,7 +30,7 @@ export async function POST (request: Request) {
         }
 
         //creates session and sets cookie
-        await createSession(user._id.toString())
+        await createSession(user._id);
 
         return NextResponse.json({
             success: true,
