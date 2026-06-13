@@ -13,11 +13,17 @@ const redditRequest = new snoowrap({
 // to avoid type issues with Listing returns from Reddit API
 redditRequest.config({ proxies: false });
 
-// variable for comment extraction --- fine tune it depending on comment quality
-const MAX_COMMENTS_PER_POST = 7;
+// variables for post & comment extraction, filtering, sorting --- fine tune these depending on comment quality
+const TOP_POSTS = 7;
+const MAX_COMMENTS_PER_POST = 10;
+const MIN_SCORE = 3;
 
 
 export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: string) => {
+
+    // helper function to convert cleanQuery (for Reddit API querying) to useable format for keyword matching
+    const queryWords = cleanQuery.replace(/\+/g, ' ').toLowerCase().split(' ').filter(w => w.length > 0);
+
     const allReplies: Array<string> = [];
     for (const sub of fetchedSubreddits) {
         try {
@@ -31,35 +37,55 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
                 });
 
             // copy Listing to make it an iterable array
-            const postsArray = [...listing];
+            const postsArray = [...listing].slice(0, TOP_POSTS);
             console.log(`r/${sub}: ${postsArray.length} posts found`);
 
             for (const post of postsArray) {
                 // console.log(`Post: ${post.title} | selftext length: ${post.selftext?.length}`);
                 if (post.selftext && post.selftext.trim() !== "") {
                     // console.log(`Post from r/${sub}:`, post.title);
-                    allReplies.push(post.selftext);
+                    // push post's title plus its selftext (i.e., the post's first comment); formatting it for better LLM analysis
+                    allReplies.push(`
+                        TITLE: ${post.title}\nBODY: ${post.selftext}`);
                 }
 
                 // capture top comments (try/catch and console.warn so it doesn't kill the whole loop)
                 // suppressing the eslint rule against using any type here --- Snoowrap TS types are throwing errors (a known problem w/ the library)
                 try {
-                        // fetch top-level comments --- consider expanding if it would capture sentiment better / improve analysis quality
+                    // fetch top-level comments --- consider expanding if it would capture sentiment better / improve analysis quality
+                    // filtering comments --- score
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const comments = await (post.expandReplies({ depth: 1, limit: MAX_COMMENTS_PER_POST }) as any);
+                    const topComments = comments.comments
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        const comments = await (post.expandReplies({ depth: 2, limit: MAX_COMMENTS_PER_POST }) as any);
-                        const topComments = comments.comments
-                            .slice(0, MAX_COMMENTS_PER_POST)
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            .filter((comment: any) => comment.body && comment.body.trim() !== "")
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            .sort((a: any, b: any) => b.score - a.score);
-    
-                        for (const comment of topComments) {
-                            allReplies.push(comment.body);
-                        }
-                    } catch (err) {
-                        console.warn(`Could not expand comments for post ${post.id}:`, err instanceof Error ? err.message : err);
+                        .filter((comment: any) => comment.body && comment.body.trim() !== "")
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        .filter((comment: any) => comment.score >= MIN_SCORE)
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        .map((comment: any) => {
+                            const body = comment.body.toLowerCase();
+                            const relevanceScore = queryWords.filter(word => body.includes(word)).length;
+                            return { ...comment, relevanceScore };
+                        })
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        .sort((a: any, b: any) => b.relevanceScore - a.relevanceScore || b.score - a.score)
+                        .slice(0, MAX_COMMENTS_PER_POST);
+
+                    for (const comment of topComments) {
+                        allReplies.push(`
+                                SUBREDDIT: r/${sub}
+                                \nPOST: ${post.title}
+                                \nCOMMENT SCORE: ${comment.score}
+                                \nRELEVANCE: ${comment.relevanceScore}
+                                \nCOMMENT: ${comment.body}
+                            `);
                     }
+
+                    // console.log(`Top Comments array in Reddit helper: ${topComments}`);
+
+                } catch (err) {
+                    console.warn(`Could not expand comments for post ${post.id}:`, err instanceof Error ? err.message : err);
+                }
             }
 
         } catch (err) {
@@ -76,9 +102,12 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
     return allReplies
 };
 
+// create a "Trending Topics" mode: sort comments by "new" instead of "top" to capture fast-moving sentiment
+
+
 // **FUTURE WORK:** explore various options for how to query Reddit API ---  Snoowrap functions (getTop w/ a time option) to fetch Top or Hot comments for threads
-// Create a "Trending Topics" mode: sort comments by "new" instead of "top" to capture fast-moving sentiment
-// Upvote threshold --- filter out comments below a minimum score to improve quality
-// Keyword relevance scoring to prioritize comments that contain the search query terms
-// Expose fetched comments to the user on the frontend so they can assess quality and refine their search
-    // (e.g., "Click to see comments fetched" so that they can get a sense of quality and modify their next search accordingly)
+    // √ Upvote threshold --- filter out comments below a minimum score to improve quality
+    // √ Keyword relevance scoring to prioritize comments that contain the search query terms
+    
+    // Expose fetched comments to the user on the frontend so they can assess quality and refine their search
+        // (e.g., "Click to see comments fetched" so that they can get a sense of quality and modify their next search accordingly)
