@@ -29,7 +29,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
                 return;
             }
 
-            const response = await fetch('/api/apiReddit', {
+            const response = await fetch('/api/generate-analysis', {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ query: searchTerm, type: type })

@@ -1,6 +1,6 @@
 // LLM model and prompt configurations for different types of analyses (general, brand insights, student trends)
 
-export type AnalysisType = "general" | "brand" | "student";
+export type AnalysisType = "general" | "brand" | "trending" | "student";
 
 type AnalysisConfig = {
     subredditPrompt: (query: string) => string;
@@ -33,8 +33,11 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             return `
             You are a sentiment analysis engine.
 
-            Here discussion from Reddit about "${query}":
-            Analyze the following posts and comments: ${promptData}.
+            Here is discussion from Reddit about "${query}":
+            Analyze the following posts and comments:
+            BEGIN REDDIT DATA
+            ${promptData}
+            END REDDIT DATA
 
             Return JSON with keys:
                 {
@@ -52,6 +55,8 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
                         { theme: string, quote: string }
                     ]
                 }
+                
+            Quotes for topThemes should be first-hand user experiences or opinions, not jokes, memes, or meta-commentary.
         `;
         },
 
@@ -78,7 +83,10 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             return `
             You are a brand analyst.
 
-            Analyze customer discussions and perception of "${query}" using: ${promptData}.
+            Analyze customer discussions and perception from Reddit about "${query}".
+            BEGIN REDDIT DATA
+            ${promptData}
+            END REDDIT DATA
 
             Focus on:
             - brand sentiment
@@ -102,6 +110,8 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
                         { theme: string, quote: string }
                     ]
                 }
+            
+            Quotes for topThemes should be first-hand user experiences or opinions, not jokes, memes, or meta-commentary.
         `;
         },
 
@@ -129,7 +139,10 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             return `
             You are a sentiment analyst.
 
-            Analyze user discussions and perception of "${query}" using: ${promptData}.
+            Analyze user discussions and perception from Reddit about "${query}".
+            BEGIN REDDIT DATA
+            ${promptData}
+            END REDDIT DATA
 
             Return JSON with keys:
                 {
@@ -147,6 +160,8 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
                         { theme: string, quote: string }
                     ]
                 }
+            
+            Quotes for topThemes should be first-hand user experiences or opinions, not jokes, memes, or meta-commentary.
         `;
         },
 
@@ -171,7 +186,10 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
         analysisPrompt: (query, data) => {
             const promptData = Array.isArray(data) ? data.join("\n\n---\n\n") : data;
             return `
-            Analyze user discussions and perceptions of "${query}" using: ${promptData}.
+            Analyze user discussions and perceptions from Reddit about "${query}".
+            BEGIN REDDIT DATA
+            ${promptData}
+            END REDDIT DATA
 
             Focus on:
             - student experiences
