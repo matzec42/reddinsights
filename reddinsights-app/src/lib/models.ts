@@ -35,11 +35,9 @@ const analysisSchema = new Schema({
         positive: Number,
         negative: Number,
         neutral: Number,
-        distribution: {
-            positive: Number,
-            negative: Number,
-            neutral: Number,
-        }
+        distribution: [{
+            _id: false, name: String, value: String
+        }]
     },
     topThemes: [
         { label: String, quote: String }

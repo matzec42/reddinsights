@@ -157,7 +157,7 @@ export async function POST(request: Request) {
         // adjust/limit length of comments in the formatting step above (e.g., .slice(0, config.maxComments)
         // see both .trim methods in the .filter and .map steps
         const parsedFinalAnalysis = JSON.parse(cleanedAnalysis);
-        console.log("Parsed analysis object:", parsedFinalAnalysis);
+        // console.log("Parsed analysis object:", parsedFinalAnalysis);
 
 
         // NOTE RE:responses --- Next.js requires native Response object to be returned
