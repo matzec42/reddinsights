@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
                 }, { status: 401 });
             }
     
-            console.log (`In save-analysis route, checking some of the req body: ${analysis.analysisTitle}, ${subreddits[0]}, ${visualization[0].name}`);
+            // console.log (`In save-analysis route, checking some of the req body: ${analysis.analysisTitle}, ${subreddits[0]}, ${visualization[0].name}`);
             
             // error handling --- check if body contains anything missing, send 400 status code
             if (!analysis || !subreddits || !visualization) {
@@ -43,18 +43,33 @@ export async function POST(request: NextRequest) {
                 }, { status: 401 });
             }
 
+            // mapping distribution values --- making percentages for the visualization
+            const distribution = visualization.map((num: { name: string, value: number }) => ({
+                name: num.name,
+                value: (num.value / analysis.commentCount).toLocaleString('en-US', { style: 'percent' })
+            }));
+
             // save analysis to MongoDB --- new document in analysis collection
             const newAnalysis = await Analysis.create({
                 userId: session.userId,
                 postTitle: analysis.analysisTitle,
                 commentCount: analysis.commentCount,
-                sentimentSummary: analysis.sentimentSummary,
-                // here, write in distribution of sentiment (e.g., 60% positive, 30% neutral, 10% negative)
-                // below, map top themes as key/values (e.g., try this --> { theme: analysis.topThemes.theme, quote: analysis.topThemes.quote})
-                topThemes: analysis.topThemes,
+                sentimentSummary: { 
+                    overall: analysis.sentimentSummary.overall,
+                    positive: analysis.sentimentSummary.positive,
+                    neutral: analysis.sentimentSummary.neutral,
+                    negative: analysis.sentimentSummary.negative,
+                    distribution: distribution
+                },
+                topThemes: analysis.topThemes.map((t: { theme: string, quote: string }) => ({
+                    label: t.theme,
+                    quote: t.quote
+                })),
                 createdAt: analysis.createdAt,
-                subreddits: subreddits,
+                subreddits: subreddits
             });
+
+            console.log(`New analysis saved in save route: ${newAnalysis}`);
 
             return NextResponse.json({ data: newAnalysis._id, success: true, message: "Analysis saved successfully!" });
 

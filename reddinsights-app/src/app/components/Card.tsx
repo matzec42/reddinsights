@@ -36,7 +36,7 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
                 alert("Failed to save analysis. Please try again.");
                 return;
             }
-
+            console.log(`Analysis saved: ${response.json()}`);
             alert("Analysis saved successfully!");
 
         } catch (err) {
@@ -57,21 +57,21 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-4">
 
                 {/* Left: Summary, Sentiment Chart */}
                 <div>
                     <p className="font-semibold mb-1">Summary</p>
                     <p className="text-gray-700 mb-6">{analysis.generalSummary}</p>
                     <p className="font-semibold mb-2">Overall Sentiment: {analysis.sentimentSummary.overall.charAt(0).toUpperCase() + analysis.sentimentSummary.overall.slice(1)}</p>
-                    <PieChart width={400} height={300}>
+                    <PieChart width={500} height={300} className="mx-auto">
                         <Pie
                             data={sentimentData}
-                            cx={140}
-                            cy={110}
+                            cx={250}
+                            cy={130}
                             outerRadius={90}
                             dataKey="value"
-                            label
+                            label={({ name, value }) => `${name}:\n${(value / analysis.commentCount * 100).toFixed(0)}%`}
                         >
                             {sentimentData.map((_, index) => (
                                 <Cell key={`cell-${index}`} fill={COLORS[index]} />
