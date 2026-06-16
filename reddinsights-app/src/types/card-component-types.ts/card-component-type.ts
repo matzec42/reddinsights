@@ -1,6 +1,7 @@
 // card-component-type.ts
 
 export interface AnalysisType {
+    _id: string,
     analysisTitle: string;
     createdAt: Date;
     commentCount: number;
@@ -10,11 +11,15 @@ export interface AnalysisType {
         positive: number;
         negative: number;
         neutral: number;
-    };
-    topThemes: { theme: string; quote: string }[];
-}
+        distribution: {
+            name: string;
+            value: string;
+        }[];
+    }
+        topThemes: { theme: string; quote: string }[];
+};
 
 export interface CardProps {
     analysis: AnalysisType,
     subreddits: string[];
-}
+};

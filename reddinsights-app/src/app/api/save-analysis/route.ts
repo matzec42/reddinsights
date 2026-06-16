@@ -12,19 +12,17 @@ export async function POST(request: NextRequest) {
             const body = await request.json();
             const { analysis, subreddits, visualization } = body;
             
-            // 
+            // validate user --- retrieve session token from cookie 
             const cookieStore = await cookies();
-            const userIdFromSessionCookie = cookieStore.get("session")?.value;
-            const session = await Session.findOne({ sessionToken: userIdFromSessionCookie });
+            const tokenFromSessionCookie = cookieStore.get("session")?.value;
+            const session = await Session.findOne({ sessionToken: tokenFromSessionCookie });
             if (!session) {
                 return NextResponse.json({
                     success: false,
                     message: "Invalid session. Please log in."
                 }, { status: 401 });
             }
-    
-            // console.log (`In save-analysis route, checking some of the req body: ${analysis.analysisTitle}, ${subreddits[0]}, ${visualization[0].name}`);
-            
+                
             // error handling --- check if body contains anything missing, send 400 status code
             if (!analysis || !subreddits || !visualization) {
                 return NextResponse.json({
@@ -52,8 +50,9 @@ export async function POST(request: NextRequest) {
             // save analysis to MongoDB --- new document in analysis collection
             const newAnalysis = await Analysis.create({
                 userId: session.userId,
-                postTitle: analysis.analysisTitle,
+                analysisTitle: analysis.analysisTitle,
                 commentCount: analysis.commentCount,
+                generalSummary: analysis.generalSummary,
                 sentimentSummary: { 
                     overall: analysis.sentimentSummary.overall,
                     positive: analysis.sentimentSummary.positive,
@@ -62,14 +61,12 @@ export async function POST(request: NextRequest) {
                     distribution: distribution
                 },
                 topThemes: analysis.topThemes.map((t: { theme: string, quote: string }) => ({
-                    label: t.theme,
+                    theme: t.theme,
                     quote: t.quote
                 })),
                 createdAt: analysis.createdAt,
                 subreddits: subreddits
             });
-
-            console.log(`New analysis saved in save route: ${newAnalysis}`);
 
             return NextResponse.json({ data: newAnalysis._id, success: true, message: "Analysis saved successfully!" });
 

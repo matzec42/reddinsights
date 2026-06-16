@@ -28,8 +28,10 @@ const sessionSchema = new Schema({
 
 const analysisSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    postTitle: String,
+    analysisTitle: String,
+    createdAt: Date,
     commentCount: Number,
+    generalSummary: String,
     sentimentSummary: {
         overall: String,
         positive: Number,
@@ -40,9 +42,8 @@ const analysisSchema = new Schema({
         }]
     },
     topThemes: [
-        { label: String, quote: String }
+        { theme: String, quote: String }
     ],
-    createdAt: Date,
     subreddits: [{ type: String }]
 });
 
