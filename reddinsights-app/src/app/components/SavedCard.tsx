@@ -1,5 +1,6 @@
 // individual Card component --- to be used in /analyzer (child of AnalyzerPage) when user makes new analysis
 // also on the SubredditsCardPage (all insights based on a topic)...?
+"use client"
 
 import React from 'react';
 import Link from 'next/link';
@@ -8,12 +9,8 @@ import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 
 const COLORS = ['#41cb5b', '#fd4c0b', '#979a9c',];
 
-const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
+const SavedCard: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
 
-    // state for saving functionality --- useState hook not needed, as data is static and passed down as props
-    // re-assigning to variables for handleSave function to access
-    const analysisData = analysis;
-    const subredditsData = subreddits;
     // assigning sentiment data for visualization
     const sentimentData = [
         { name: 'Positive', value: analysis.sentimentSummary.positive },
@@ -23,31 +20,6 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
 
     // TO-DO: edit data attribute on Pie component --- pull values from sentimentSummary property and convert here, before return
     // LONGER TERM: edit models/DB to store numbers instead of strings, check that storage and usage is consistent in other components (DashboardCard, Card, SavedCard)
-
-
-    const handleSaveAnalysis = async () => {
-        const payload = { analysis: analysisData, subreddits: subredditsData, visualization: sentimentData };
-
-        try {
-            const response = await fetch('/api/save-analysis', {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                alert("Failed to save analysis. Please try again.");
-                return;
-            }
-            console.log(`Analysis saved: ${response.json()}`);
-            alert("Analysis saved successfully!");
-
-        } catch (err) {
-                console.error("Error saving analysis", err);
-                alert("Something went wrong while trying to save your analysis. Please try again.");
-        }
-    }
-
 
     return (
         <div className="p-6 bg-white border border-gray-200 rounded-2xl shadow-lg">
@@ -65,7 +37,7 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
                 {/* Left: Summary, Sentiment Chart */}
                 <div>
                     <p className="font-semibold mb-1">Summary</p>
-                    <p className="text-gray-700 mb-6">{analysis.generalSummary}</p>
+                    <p className="text-gray-700 mb-6">{analysis.analysisTitle}</p>
                     <p className="font-semibold mb-2">Overall Sentiment: {analysis.sentimentSummary.overall.charAt(0).toUpperCase() + analysis.sentimentSummary.overall.slice(1)}</p>
                     <PieChart width={500} height={300} className="mx-auto">
                         <Pie
@@ -83,7 +55,6 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
                         <Tooltip />
                         <Legend />
                     </PieChart>
-                    <button id="save-analysis" onClick={() => handleSaveAnalysis()} className="px-5 py-2 mt-10 ml-5 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500">Save These Reddinsights</button>
                 </div>
 
                 {/* Right: Top Themes, subreddit Links */}
@@ -115,4 +86,4 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
     );
 };
 
-export default Card;
+export default SavedCard;
