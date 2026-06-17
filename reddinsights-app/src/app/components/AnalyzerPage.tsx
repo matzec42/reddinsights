@@ -2,16 +2,18 @@
 
 import Navbar from '../components/Navbar';
 import Card from '../components/Card';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 const AnalyzerPage: React.FunctionComponent = () => {
     // state for search results
     const [searchResults, setSearchResults] = useState(null);
     const [subreddits, setSubreddits] = useState<string[]>([]);
     const [analysisType, setAnalysisType] = useState("general");
-    const [isLoading, setIsLoading] = useState(false);
+    // const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+    // hook to call form reset, invoked after user submits search
+    const formRef = useRef<HTMLFormElement>(null);
 
     // handleSearchSubmit function for user's search term (POST)
     const handleSearchSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -21,7 +23,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
         const searchTerm = formInputData.get("query") as string;
         const type = analysisType;
 
-        setIsLoading(true);
+        // setIsLoading(true);
 
         try {
             if (!searchTerm.trim()) {
@@ -42,16 +44,29 @@ const AnalyzerPage: React.FunctionComponent = () => {
                 setSearchResults(null);
                 return;
             }
+
+            // update state
             setSearchResults(fetchedAnalysis.data[0]);
             setSubreddits(fetchedAnalysis.data[1]);
-
+            // resets search bar
+            formRef.current?.reset();
+            
         } catch (err) {
             console.error("Error fetching analysis", err);
             alert("Something went wrong while trying to fetch insights. Please try again.");
         } finally {
-            setIsLoading(false);
+            // setIsLoading(false);
         }
     }
+    
+    // handler for resetting page/clearing card after a save --- needs to be passed down as prop to Card,
+    // since save functionality lives there but state (user's search result) lives here.
+    // maybe re-visit later...not sure about usefulness of this
+    const resetAnalysis = () => {
+        setSearchResults(null);
+        setSubreddits([]);
+    };
+
 
     return (
         <div>
@@ -92,6 +107,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
                 {/* Search Form */}
                 <section className="mb-8">
                     <form
+                        ref={formRef}
                         onSubmit={handleSearchSubmit}
                         method="post"
                         className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm"
@@ -106,53 +122,45 @@ const AnalyzerPage: React.FunctionComponent = () => {
                                 placeholder="Type a subreddit name or topic (e.g., Target, Amazon)"
                             />
 
-                            <div className="flex flex-wrap gap-3">
+                            <div className="flex justify-between gap-3">
                                 <button
                                     id="general-analysis"
                                     onClick={() => setAnalysisType("general")}
-                                    disabled={isLoading}
+                                    // disabled={isLoading}
                                     type="submit"
                                     className="px-5 py-2 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500"
                                 >
-                                    {isLoading
-                                        ? "Analyzing..."
-                                        : "General Analysis"}
+                                    General Analysis
                                 </button>
 
                                 <button
                                     id="brand-insights"
                                     onClick={() => setAnalysisType("brand")}
-                                    disabled={isLoading}
+                                    // disabled={isLoading}
                                     type="submit"
                                     className="px-5 py-2 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500"
                                 >
-                                    {isLoading
-                                        ? "Analyzing..."
-                                        : "Brand Insights"}
+                                    Brand Insights
                                 </button>
 
                                 <button
                                     id="trending-topics"
                                     onClick={() => setAnalysisType("trending")}
-                                    disabled={isLoading}
+                                    // disabled={isLoading}
                                     type="submit"
                                     className="px-5 py-2 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500"
                                 >
-                                    {isLoading
-                                        ? "Analyzing..."
-                                        : "Trending Topics"}
+                                    Trending Topics
                                 </button>
 
                                 <button
                                     id="education-trends"
                                     onClick={() => setAnalysisType("student")}
-                                    disabled={isLoading}
+                                    // disabled={isLoading}
                                     type="submit"
                                     className="px-5 py-2 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500"
                                 >
-                                    {isLoading
-                                        ? "Analyzing..."
-                                        : "Student Trends"}
+                                    Student Trends
                                 </button>
                             </div>
                         </div>
@@ -162,7 +170,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
                 {/* Results */}
                 <section>
                     {searchResults ? (
-                        <Card analysis={searchResults} subreddits={subreddits} />
+                        <Card analysis={searchResults} subreddits={subreddits} onSave={resetAnalysis}/>
                     ) : errorMessage ? (
                         <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-red-600">
                             {errorMessage}

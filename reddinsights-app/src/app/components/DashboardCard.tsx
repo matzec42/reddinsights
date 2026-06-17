@@ -12,7 +12,10 @@ const DashboardCard: React.FunctionComponent<{ analysis: AnalysisType }> = ({ an
     return (
         <div className="p-4 bg-white border border-gray-200 rounded-lg shadow hover:shadow-lg transition duration-200">
             <Link key={analysis._id} href={`/saved/${analysis._id}`} className="w-full">
+            
                 <h2 className="font-bold">{analysis.analysisTitle}</h2>
+                <p className="mt-3"><i>Created at {new Date(analysis.createdAt).toLocaleString()}</i></p>
+
                 <PieChart width={300} height={280} className="mx-auto">
                     <Pie
                         data={analysis.sentimentSummary.distribution
@@ -36,7 +39,7 @@ const DashboardCard: React.FunctionComponent<{ analysis: AnalysisType }> = ({ an
                     <Tooltip />
                     <Legend />
                 </PieChart>
-                <p className="mt-3"><i>Created at {new Date(analysis.createdAt).toLocaleString()}</i></p>
+
             </Link>
         </div>
     )

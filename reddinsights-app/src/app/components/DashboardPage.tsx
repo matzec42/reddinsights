@@ -5,10 +5,10 @@ import DashboardCard from './DashboardCard';
 import { AnalysisType } from '@/types/card-component-types.ts/card-component-type';
 
 const DashboardPage: React.FunctionComponent = () => {
-    // state for dashboard data (past analyses associate w/ user)
+    // state for dashboard data (past analyses associated w/ user)
     const [userAnalyses, setUserAnalyses] = useState([]);
 
-    // useEffect to fetch past analysis on component mount (GET request to /api/get-analyses)
+    // useEffect to fetch past analysis on component mount
     useEffect(() => {
         const fetchPastAnalyses = async () => {
             try {

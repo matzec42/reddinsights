@@ -22,7 +22,7 @@ const Navbar: React.FunctionComponent = () => {
                     alt={"Menu button"}
                     src={"/menu.svg"}
                 />
-
+                
                 <Link href="/dashboard">
                     <h1 className="text-4xl font-bold mb-6 mt-4">Reddinsights</h1>
                 </Link>
@@ -34,6 +34,7 @@ const Navbar: React.FunctionComponent = () => {
                 </Link>
 
                 <button
+                    className="mr-5"
                     onClick={async () => {
                         await fetch('/api/auth/logout', { method: 'POST' })
                         window.location.href = '/'
