@@ -6,7 +6,7 @@ const AboutPage: React.FunctionComponent = () => {
             <Navbar />
             <div className="min-h-screen flex flex-col justify-center items-center">
 
-                <div className="flex flex-col justify-center items-center md:w-1/2 p-6 bg-white border border-gray-200 rounded-2xl shadow-lg">
+                <div className="flex flex-col justify-center mt-6 items-center md:w-1/2 p-6 bg-white border border-gray-200 rounded-2xl shadow-lg">
 
                     <h1 className="text-3xl font-bold mb-6">About</h1>
 
@@ -25,7 +25,7 @@ const AboutPage: React.FunctionComponent = () => {
                         <p className="text-gray-700 leading-relaxed">
                             Hello! My name is Chris and I&apos;m an engineer with a background in JavaScript and TypeScript, full-stack web development, 
                             and applied AI. Graduate of Codesmith. Co-creator of CacheIQL, an open source pair of libraries providing 
-                            server- and client-side caching solutions for GraphQL users. Currently exploring LLM integration, retrieval augmented generation (RAG), 
+                            server- and client-side caching solutions for GraphQL users. Currently exploring Python, LLM integration, retrieval augmented generation (RAG), 
                             and AI-powered product development.
                         </p>
                         <p className="text-gray-700 leading-relaxed mt-4">

@@ -1,14 +1,14 @@
 // individual Card component --- to be used in /analyzer (child of AnalyzerPage) when user makes new analysis
-// also on the SubredditsCardPage (all insights based on a topic)...?
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { CardProps } from '../../types/card-component-types.ts/card-component-type';
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 
 const COLORS = ['#41cb5b', '#fd4c0b', '#979a9c',];
 
-const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
+const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits, onSave }) => {
 
     // state for saving functionality --- useState hook not needed, as data is static and passed down as props
     // re-assigning to variables for handleSave function to access
@@ -24,7 +24,6 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
     // TO-DO: edit data attribute on Pie component --- pull values from sentimentSummary property and convert here, before return
     // LONGER TERM: edit models/DB to store numbers instead of strings, check that storage and usage is consistent in other components (DashboardCard, Card, SavedCard)
 
-
     const handleSaveAnalysis = async () => {
         const payload = { analysis: analysisData, subreddits: subredditsData, visualization: sentimentData };
 
@@ -39,12 +38,14 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
                 alert("Failed to save analysis. Please try again.");
                 return;
             }
-            console.log(`Analysis saved: ${response.json()}`);
+            // console.log(`Analysis saved: ${response.json()}`);
             alert("Analysis saved successfully!");
+            // triggers state reset (form, display of card) in AnalyzerPage
+            onSave();
 
         } catch (err) {
-                console.error("Error saving analysis", err);
-                alert("Something went wrong while trying to save your analysis. Please try again.");
+            console.error("Error saving analysis", err);
+            alert("Something went wrong while trying to save your analysis. Please try again.");
         }
     }
 
@@ -54,6 +55,15 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
 
             {/* Header */}
             <div className="mb-6">
+                <Link href="/dashboard">
+                    <Image
+                        width={20}
+                        height={20}
+                        alt={"Back button"}
+                        src={"/arrow_back.svg"}
+                        className="mb-3"
+                    />
+                </Link>
                 <h2 className="font-bold text-2xl">{analysis.analysisTitle}</h2>
                 <p className="text-sm text-gray-500 mt-1">{new Date(analysis.createdAt).toLocaleString()}</p>
                 <p className="text-sm text-gray-500">Comments analyzed: {analysis.commentCount}</p>
@@ -83,7 +93,6 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
                         <Tooltip />
                         <Legend />
                     </PieChart>
-                    <button id="save-analysis" onClick={() => handleSaveAnalysis()} className="px-5 py-2 mt-10 ml-5 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500">Save These Reddinsights</button>
                 </div>
 
                 {/* Right: Top Themes, subreddit Links */}
@@ -109,6 +118,17 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
                     </ul>
                 </div>
 
+            </div>
+
+            {/* Save Button */}
+            <div className="w-130 flex justify-center mt-6">
+                <button 
+                    id="save-analysis"
+                    onClick={() => handleSaveAnalysis()}
+                    className="px-5 py-2 rounded-lg text-white font-bold bg-green-500 hover:bg-green-400"
+                >
+                    Save Reddinsights
+                </button>
             </div>
 
         </div>

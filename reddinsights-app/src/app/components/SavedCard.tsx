@@ -1,15 +1,19 @@
-// individual Card component --- to be used in /analyzer (child of AnalyzerPage) when user makes new analysis
-// also on the SubredditsCardPage (all insights based on a topic)...?
 "use client"
 
 import React from 'react';
 import Link from 'next/link';
-import { CardProps } from '../../types/card-component-types.ts/card-component-type';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { isRedirectError } from 'next/dist/client/components/redirect-error';
+import { SavedCardProps } from '../../types/card-component-types.ts/card-component-type';
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 
 const COLORS = ['#41cb5b', '#fd4c0b', '#979a9c',];
 
-const SavedCard: React.FunctionComponent<CardProps> = ({ analysis, subreddits }) => {
+const SavedCard: React.FunctionComponent<SavedCardProps> = ({ analysis, subreddits }) => {
+
+    // invoke useRouter for redirect to dashboard after successful deletion
+    const router = useRouter();
 
     // assigning sentiment data for visualization
     const sentimentData = [
@@ -18,14 +22,49 @@ const SavedCard: React.FunctionComponent<CardProps> = ({ analysis, subreddits })
         { name: 'Neutral', value: analysis.sentimentSummary.neutral },
     ];
 
+    const handleDeleteAnalysis = async () => {
+        const id = analysis._id
+
+        try {
+            const response = await fetch('/api/delete-analysis', {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json"},
+                body: JSON.stringify({ id })
+            })
+
+            if (!response.ok) {
+                throw new Error("Failed to delete recipe");
+            }
+
+            const data = await response.json();
+            console.log("Response from delete-api: ", data.message);
+            alert("Analysis successfully deleted.");
+            router.push("/dashboard");
+
+        } catch (err) {
+            if (isRedirectError(err)) throw err;
+            console.error("Error deleting analysis", err);
+            alert("Something went wrong while trying to delete your analysis.");
+        }
+    }
+
     // TO-DO: edit data attribute on Pie component --- pull values from sentimentSummary property and convert here, before return
     // LONGER TERM: edit models/DB to store numbers instead of strings, check that storage and usage is consistent in other components (DashboardCard, Card, SavedCard)
 
     return (
         <div className="p-6 bg-white border border-gray-200 rounded-2xl shadow-lg">
+            
+            <Link href="/dashboard">
+                    <Image
+                        width={20}
+                        height={20}
+                        alt={"Back button"}
+                        src={"/arrow_back.svg"}
+                    />
+            </Link>
 
             {/* Header */}
-            <div className="mb-6">
+            <div className="mt-3 mb-6">
                 <h2 className="font-bold text-2xl">{analysis.analysisTitle}</h2>
                 <p className="text-sm text-gray-500 mt-1">{new Date(analysis.createdAt).toLocaleString()}</p>
                 <p className="text-sm text-gray-500">Comments analyzed: {analysis.commentCount}</p>
@@ -80,6 +119,17 @@ const SavedCard: React.FunctionComponent<CardProps> = ({ analysis, subreddits })
                     </ul>
                 </div>
 
+            </div>
+
+            {/* Delete Button */}
+            <div className="w-130 flex justify-center mt-6">
+                <button 
+                    id="delete-analysis"
+                    onClick={() => handleDeleteAnalysis()}
+                    className="px-5 py-2 rounded-lg text-white font-bold bg-red-500 hover:bg-red-400"
+                >
+                    Delete Reddinsights
+                </button>
             </div>
 
         </div>
