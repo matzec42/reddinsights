@@ -59,13 +59,14 @@ const AnalyzerPage: React.FunctionComponent = () => {
         }
     }
     
-    // handler for resetting page/clearing card after a save --- needs to be passed down as prop to Card,
+    // Handler for resetting page/clearing card after a save --- needs to be passed down as prop to Card,
     // since save functionality lives there but state (user's search result) lives here.
-    // maybe re-visit later...not sure about usefulness of this
-    const resetAnalysis = () => {
-        setSearchResults(null);
-        setSubreddits([]);
-    };
+    // Commented out for now...not sure about usefulness of this
+        // Card.tsx, card-component-type.ts also have related functionality for this commented out (for now)
+    // const resetAnalysis = () => {
+    //     setSearchResults(null);
+    //     setSubreddits([]);
+    // };
 
 
     return (
@@ -170,7 +171,11 @@ const AnalyzerPage: React.FunctionComponent = () => {
                 {/* Results */}
                 <section>
                     {searchResults ? (
-                        <Card analysis={searchResults} subreddits={subreddits} onSave={resetAnalysis}/>
+                        <Card
+                            analysis={searchResults}
+                            subreddits={subreddits}
+                            // onSave={resetAnalysis}
+                        />
                     ) : errorMessage ? (
                         <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-red-600">
                             {errorMessage}
