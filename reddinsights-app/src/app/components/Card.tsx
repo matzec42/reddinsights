@@ -1,4 +1,4 @@
-// individual Card component --- to be used in /analyzer (child of AnalyzerPage) when user makes new analysis
+// Individual Card component --- to be used in /analyzer (child of AnalyzerPage) when user makes new analysis
 
 import React from 'react';
 import Link from 'next/link';
@@ -8,7 +8,7 @@ import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 
 const COLORS = ['#41cb5b', '#fd4c0b', '#979a9c',];
 
-const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits, onSave }) => {
+const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits, /* onSave */ }) => {
 
     // state for saving functionality --- useState hook not needed, as data is static and passed down as props
     // re-assigning to variables for handleSave function to access
@@ -40,8 +40,9 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits, onSave
             }
             // console.log(`Analysis saved: ${response.json()}`);
             alert("Analysis saved successfully!");
+
             // triggers state reset (form, display of card) in AnalyzerPage
-            onSave();
+            // onSave();
 
         } catch (err) {
             console.error("Error saving analysis", err);

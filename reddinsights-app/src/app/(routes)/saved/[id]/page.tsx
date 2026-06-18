@@ -1,7 +1,6 @@
 import SavedCard from "@/app/components/SavedCard";
 import Navbar from "@/app/components/Navbar";
 import { ReddinsightsSchema } from "@/lib/models";
-import { SavedCardProps } from "@/app/types/card-component-types.ts/card-component-type";
 
 const SavedAnalysis = async ({ params }: {params: { id: string }}) => {
     // params works like the useParams hook in regular React, grabs from URL
