@@ -85,10 +85,6 @@ export async function POST(request: Request) {
             }, { status: 500 });
         }
 
-        // **TO-DO**: edge case / error handling for empty array (no relevant subreddits found) ... after the first prompt, it's possible it could be empty
-        // early exit and response here --- avoids Reddit fetch, second AI API analysis call
-        // on frontend, a message to try a new search to yield results
-
 
         /* Reddit API call --- returns an array of comments from the fetched subreddits */
         const redditReplies = await getRedditReplies(fetchedSubreddits, cleanQuery);
@@ -117,7 +113,9 @@ export async function POST(request: Request) {
         // consider tracking/looking at subreddit URLs on fetched replies --> for second API query, prompt to focus on most relevant & focus on customer sentiment only (not employees, ads, etc.)
         // **KEY** --- current Reddit fetching only captures post selftext, misses much of discussion which lives in comment threads
         // look into implementing expandReplies() in reddit-api-helper (see lib folder) to a certain depth; means more expensive Reddit calls but worth it
-        // see notes in /lib/reddit-api-helper !!!
+        // see notes in /lib/reddit-api-helper!
+
+        // **FUTURE WORK** --- include comments in response, allow frontend user to view
 
 
         /* Structured Compression --- filtering/normalizing for length (.filter), capping array size (.slice), formatting for the LLM (.map w/ .join) */
