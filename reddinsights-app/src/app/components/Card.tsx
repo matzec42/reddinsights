@@ -128,7 +128,7 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits, /* onS
                     onClick={() => handleSaveAnalysis()}
                     className="px-5 py-2 rounded-lg text-white font-bold bg-green-500 hover:bg-green-400"
                 >
-                    Save Reddinsights
+                    Save Analysis
                 </button>
             </div>
 

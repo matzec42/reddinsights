@@ -128,7 +128,7 @@ const SavedCard: React.FunctionComponent<SavedCardProps> = ({ analysis, subreddi
                     onClick={() => handleDeleteAnalysis()}
                     className="px-5 py-2 rounded-lg text-white font-bold bg-red-500 hover:bg-red-400"
                 >
-                    Delete Reddinsights
+                    Delete Analysis
                 </button>
             </div>
 
