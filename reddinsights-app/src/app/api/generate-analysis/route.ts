@@ -1,9 +1,30 @@
 /* Main API route for handling Reddit data fetching and AI analysis */
 
 import { NextResponse } from "next/server";
-import { groqCall } from '@/lib/groq-api-helpers';
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis"
+import { groqCall } from "@/lib/groq-api-helpers";
 import { analysisConfigs } from "@/lib/analysisConfigs";
 import { getRedditReplies } from "@/lib/reddit-api-helper";
+
+// creates Redis instance
+const redis = Redis.fromEnv();
+
+// creates a rate limit instance for Groq AI calls
+// sliding window (looking back from present to avoid fixed window spike)
+// params are max # of requests per min, time in seconds for a sliding window
+const groqLimiter = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(30, "60 s"),
+    prefix: "ratelimit:groq",
+});
+
+// creates a rate limit instance for Reddit calls
+const redditLimiter = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(60, "60 s"),
+    prefix: "ratelimit:reddit",
+});
 
 // simple in-memory caching
 // replace w/ DB caching (MongoDB)
@@ -21,6 +42,7 @@ export async function POST(request: Request) {
         // parse the req body
         const body = await request.json();
         const { query, type = "general" } = body;
+        // config --- gets assigned the type of whatever analysis was requested (e.g., general, brand, student, etc.)
         const config = analysisConfigs[type];
 
         // error handling for missing or invalid config type or query
@@ -43,6 +65,7 @@ export async function POST(request: Request) {
         // const cleanQuery = query.trim().replace(/[^a-zA-Z0-9_-]/g, "");
         const cleanQuery = query.trim().replace(/[^a-zA-Z0-9_\- ]/g, "").replace(/\s+/g, "+");
 
+
         /* Cache Check (in-memory, temporary until DB version is set up) */
         // caching --- create key (clean query + analysis type)
         const cacheKey = `${cleanQuery}-${type}`;
@@ -54,6 +77,16 @@ export async function POST(request: Request) {
 
 
         /* First AI API call --- cheap call to fetch relevant subreddit titles */
+        // check Redis to see if limit of Groq calls has been reached
+        // set for global (i.e., how much of whole amount of Groq usage is left) and sliding window
+        const { success: groqOk1 } = await groqLimiter.limit("global");
+        if (!groqOk1) {
+            return NextResponse.json({
+                success: false,
+                message: "High demand on Groq AI right now. Please try again later."
+            }, { status: 429 });
+        }
+
         // Groq API call (returns a JSON string)
         const subredditList = await groqCall({
             prompt: config.subredditPrompt(cleanQuery),
@@ -87,6 +120,15 @@ export async function POST(request: Request) {
 
 
         /* Reddit API call --- returns an array of comments from the fetched subreddits */
+        // invokes Reddit limiter to check Redis, see if rate limit for querying Reddit API has been hit
+        const { success: redditOk } = await redditLimiter.limit("global");
+        if (!redditOk) {
+            return NextResponse.json({
+                success: false,
+                message: "High demand on Reddit right now. Please try again later."
+            }, { status: 429 });
+        }
+
         const redditReplies = await getRedditReplies(fetchedSubreddits, cleanQuery);
         console.log(`Number of comments/Reddit replies fetched: `, redditReplies.length);
 
@@ -129,6 +171,14 @@ export async function POST(request: Request) {
 
 
         /* Second AI API call --- Sentiment Analysis (returns a JSON object with analysis results) */
+        const { success: groqOk2 } = await groqLimiter.limit("global");
+        if (!groqOk2) {
+            return NextResponse.json({
+                success: false,
+                message: "High demand on Groq AI right now. Please try again later."
+            }, { status: 429 });
+        }
+
         const analyzedRaw = await groqCall({
             prompt: config.analysisPrompt(cleanQuery, formattedReplies),
             model: config.modelAnalysis,
@@ -145,15 +195,18 @@ export async function POST(request: Request) {
 
         // additional cleaning --- prompt instructions don't always fully resolve this 
         const cleanedAnalysis = analyzedRaw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
-        // console.log("Cleaned analysis string:", cleanedAnalysis);
+        console.log("Cleaned analysis string:", cleanedAnalysis);
 
         // final parsing analysis
         // NOTE: parse error can occur because of incomplete/truncated string (i.e., if it's too long).
         // mitigate by:
-        // adjusting maxTokens in the Groq API call (see lib/groq-api-helpers.ts)
-        // adjust # of comments in formattedReplies (see config.maxComments in lib/analysisConfigs.ts)
-        // adjust/limit length of comments in the formatting step above (e.g., .slice(0, config.maxComments)
-        // see both .trim methods in the .filter and .map steps
+            // adjusting maxTokens in the Groq API call (see lib/groq-api-helpers.ts)
+            // adjust # of comments in formattedReplies (see config.maxComments in lib/analysisConfigs.ts)
+            // adjust/limit length of comments in the formatting step above (e.g., .slice(0, config.maxComments)
+            // see both .trim methods in the .filter and .map steps
+
+        // **TO-DO:** additional defensive parsing to extract the JSON object (e.g. a regex expression that searches for everything between the backticks...?)
+            // why? --> rare edge case where model doesn't strictly follow prompt instructions (e.g., additional text or explanation after making the JSON object)
         const parsedFinalAnalysis = JSON.parse(cleanedAnalysis);
         // console.log("Parsed analysis object:", parsedFinalAnalysis);
 
