@@ -13,8 +13,11 @@ type AnalysisConfig = {
 };
 
 // **FUTURE WORK**: experiment with config options (tokens, temperature) for the differents types; simplify/reduce directions without sacrificing quality of AI output; even try different models
-    // using more efficient model (8b-instant) for the basic task of finding subreddits --- less expensive
-    // using more powerful model (70b-versatile) for the actual analysis of the comments --- more expensive, but want higher quality output for the analysis
+    // Using more efficient model (8b-instant) for the basic task of finding subreddits --- less expensive
+    // Using more robust model (70b-versatile) for the actual analysis of the comments --- more expensive, but want higher quality output for the analysis
+    // Even w/ rate limiting, token usage for analysis (llama-3.3-70b-versatile) is currently a bottleneck,
+    // experimenting with other models (llama-3.1-8b-instant, meta-llama/llama-4-scout-17b-16e-instruct, and openai/gpt-oss-120b) that have higher TPM and TPD.
+    // Especially TPD so have a higher ceiling (more requests can be made per day) w/o sacrificing quality
 
 
 export const analysisConfigs: Record<string, AnalysisConfig> = {
