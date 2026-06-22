@@ -33,13 +33,13 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             return `
             You are a sentiment analysis engine.
 
-            Here is discussion from Reddit about "${query}":
+            Here is discussion from Reddit about "${query}".
             Analyze the following posts and comments:
             BEGIN REDDIT DATA
             ${promptData}
             END REDDIT DATA
 
-            Return JSON with keys:
+            Return ONLY valid JSON with these keys:
                 {
                     analysisTitle: string,
                     createdAt: ${new Date()},
@@ -62,7 +62,7 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
 
         systemPrompt: "Return ONLY valid JSON. No markdown. No backticks.",
         modelSubreddit: "llama-3.1-8b-instant",
-        modelAnalysis: "llama-3.3-70b-versatile",
+        modelAnalysis: "meta-llama/llama-4-scout-17b-16e-instruct", /*"llama-3.3-70b-versatile"*/
         temperature: 0.3,
         maxComments: 30,
         },
@@ -84,17 +84,12 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             You are a brand analyst.
 
             Analyze customer discussions and perception from Reddit about "${query}".
+            Focus on brand sentiment, product quality, pricing perception, competitor mentions (names, specific products or services).
             BEGIN REDDIT DATA
             ${promptData}
             END REDDIT DATA
 
-            Focus on:
-            - brand sentiment
-            - product quality
-            - pricing perception
-            - competitor mentions (names, specific products or services)
-
-            Return JSON with keys:
+            Return ONLY valid JSON with these keys:
                 {
                     analysisTitle: string,
                     createdAt: ${new Date()},
@@ -117,7 +112,7 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
 
     systemPrompt: "Return ONLY valid JSON. No markdown. No backticks.",
     modelSubreddit: "llama-3.1-8b-instant",
-    modelAnalysis: "llama-3.3-70b-versatile",
+    modelAnalysis: "meta-llama/llama-4-scout-17b-16e-instruct", /*"llama-3.3-70b-versatile", */
     temperature: 0.3,
     maxComments: 30,
     },
@@ -144,7 +139,7 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             ${promptData}
             END REDDIT DATA
 
-            Return JSON with keys:
+            Return ONLY valid JSON with these keys:
                 {
                     analysisTitle: string,
                     createdAt: ${new Date()},
@@ -167,7 +162,7 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
 
     systemPrompt: "Return ONLY valid JSON. No markdown. No backticks.",
     modelSubreddit: "llama-3.1-8b-instant",
-    modelAnalysis: "llama-3.3-70b-versatile",
+    modelAnalysis: "meta-llama/llama-4-scout-17b-16e-instruct",
     temperature: 0.3,
     maxComments: 30,
     },
@@ -187,18 +182,12 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             const promptData = Array.isArray(data) ? data.join("\n\n---\n\n") : data;
             return `
             Analyze user discussions and perceptions from Reddit about "${query}".
+            Focus on student experiences, student opinions, trends, behavior patterns, and affordability.
             BEGIN REDDIT DATA
             ${promptData}
             END REDDIT DATA
 
-            Focus on:
-            - student experiences
-            - student opinions
-            - trends
-            - behavior patterns
-            - affordability
-
-            Return JSON with keys:
+            Return ONLY valid JSON with these keys.
                 {
                     analysisTitle: string,
                     createdAt: ${new Date()},
@@ -218,7 +207,7 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
         },
     systemPrompt: "Return ONLY valid JSON. No markdown. No backticks.",
     modelSubreddit: "llama-3.1-8b-instant",
-    modelAnalysis: "llama-3.3-70b-versatile",
+    modelAnalysis: "meta-llama/llama-4-scout-17b-16e-instruct",
     temperature: 0.4,
     maxComments: 30,
     }
