@@ -195,7 +195,7 @@ export async function POST(request: Request) {
 
         // additional cleaning --- prompt instructions don't always fully resolve this 
         const cleanedAnalysis = analyzedRaw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
-        console.log("Cleaned analysis string:", cleanedAnalysis);
+        // console.log("Cleaned analysis string:", cleanedAnalysis);
 
         // final parsing analysis
         // NOTE: parse error can occur because of incomplete/truncated string (i.e., if it's too long).
@@ -205,7 +205,7 @@ export async function POST(request: Request) {
             // adjust/limit length of comments in the formatting step above (e.g., .slice(0, config.maxComments)
             // see both .trim methods in the .filter and .map steps
 
-        // **TO-DO:** additional defensive parsing to extract the JSON object (e.g. a regex expression that searches for everything between the backticks...?)
+        // **TO-DO:** additional defensive parsing to extract the JSON object? (e.g. a regex expression that searches for everything between the backticks...?)
             // why? --> rare edge case where model doesn't strictly follow prompt instructions (e.g., additional text or explanation after making the JSON object)
         const parsedFinalAnalysis = JSON.parse(cleanedAnalysis);
         // console.log("Parsed analysis object:", parsedFinalAnalysis);
