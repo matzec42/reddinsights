@@ -43,7 +43,7 @@ export async function groqCall({
 
     // error handling is in route.ts, as this needs to return a string
     if (!groqContent) {
-        return "No content returned from Groq AI helper"
+        return "No content returned from Groq AI helper."
     }
     return groqContent;
 }

@@ -10,16 +10,16 @@ import { getRedditReplies } from "@/lib/reddit-api-helper";
 // creates Redis instance
 const redis = Redis.fromEnv();
 
-// creates a rate limit instance for Groq AI calls
+// creates a rate limit instance for Groq AI API calls
 // sliding window (looking back from present to avoid fixed window spike)
-// params are max # of requests per min, time in seconds for a sliding window
+// params are max # of requests per min (number), time in seconds for a sliding window (string)
 const groqLimiter = new Ratelimit({
     redis,
     limiter: Ratelimit.slidingWindow(30, "60 s"),
     prefix: "ratelimit:groq",
 });
 
-// creates a rate limit instance for Reddit calls
+// creates a rate limit instance for Reddit API calls
 const redditLimiter = new Ratelimit({
     redis,
     limiter: Ratelimit.slidingWindow(60, "60 s"),
