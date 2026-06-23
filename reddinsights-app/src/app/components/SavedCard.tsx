@@ -37,7 +37,7 @@ const SavedCard: React.FunctionComponent<SavedCardProps> = ({ analysis, subreddi
             }
 
             const data = await response.json();
-            console.log("Response from delete-api: ", data.message);
+            console.log("Response: ", data.message);
             alert("Analysis successfully deleted.");
             router.push("/dashboard");
 

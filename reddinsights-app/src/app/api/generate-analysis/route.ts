@@ -130,14 +130,14 @@ export async function POST(request: Request) {
         }
 
         const redditReplies = await getRedditReplies(fetchedSubreddits, cleanQuery);
-        console.log(`Number of comments/Reddit replies fetched: `, redditReplies.length);
+        // console.log(`Number of comments/Reddit replies fetched: `, redditReplies.length);
 
         // error handling for empty array (search was valid/executed b/c subreddits were found and used to query, but no comments were fetched)
         // message on response object gets rendered on frontend
         if (redditReplies.length === 0) {
             return NextResponse.json({
                 success: false,
-                message: "No Reddit posts found. Try modifying your search term(s) or using a different mode (e.g., General)."
+                message: "Hmm, couldn't find Reddit posts for this search. Try modifying your search term(s) or using a different mode (e.g., General)."
             }, { status: 404 });
         }
         // edge case --- insufficient comments in array (AI will hallucinate otherwise)
@@ -218,11 +218,11 @@ export async function POST(request: Request) {
         const result = {
             success: true,
             message: "Fetch successful",
-            data: [parsedFinalAnalysis, fetchedSubreddits]
+            data: [parsedFinalAnalysis, fetchedSubreddits, formattedReplies.split("---")]
         }
 
         // save finished result of full pipeline run to cache
-        cache.set(cacheKey, { data: [parsedFinalAnalysis, fetchedSubreddits], timestamp: Date.now() });
+        cache.set(cacheKey, { data: [parsedFinalAnalysis, fetchedSubreddits, formattedReplies.split("---")], timestamp: Date.now() });
 
         console.log(`Full pipeline for: ${cacheKey} | Response time: ${Date.now() - startTime}ms`);
         
