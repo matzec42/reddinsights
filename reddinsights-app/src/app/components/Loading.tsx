@@ -8,7 +8,9 @@ const MESSAGES = [
     "Fetching Reddit comments...",
     "Analyzing sentiment...",
     "Still working...",
-    "Almost done..."
+    "Almost done...",
+    "Finishing analysis...",
+    "Thanks for your patience..."
 ];
 
 const Loading: React.FunctionComponent = () => {

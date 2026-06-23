@@ -3,12 +3,15 @@
 import Navbar from '../components/Navbar';
 import Card from '../components/Card';
 import Loading from '../components/Loading';
+import CommentsList from './CommentsList';
 import { useState, useRef } from 'react';
 
 const AnalyzerPage: React.FunctionComponent = () => {
     // state for search results
     const [searchResults, setSearchResults] = useState(null);
     const [subreddits, setSubreddits] = useState<string[]>([]);
+    const [redditComments, setRedditComments] = useState([]);
+    const [showComments, setShowComments] = useState(false);
     const [analysisType, setAnalysisType] = useState("general");
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -49,6 +52,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
             // update state
             setSearchResults(fetchedAnalysis.data[0]);
             setSubreddits(fetchedAnalysis.data[1]);
+            setRedditComments(fetchedAnalysis.data[2]);
             // resets search bar
             formRef.current?.reset();
 
@@ -85,11 +89,11 @@ const AnalyzerPage: React.FunctionComponent = () => {
 
                         <ul className="space-y-3 list-disc list-inside text-gray-700">
                             <li>
-                                Enter a Subreddit name (if you know it) or a search topic you want to get insights for (e.g., <i>McDonalds</i> for http://www.reddit.com/r/McDonalds, or a simple search like <i>McDonalds value menu</i>).
+                                Enter a <b>subreddit name</b> (if you know it) or a <b>search terms</b> for a topic you want to get insights for (e.g., <i>McDonalds</i> for http://www.reddit.com/r/McDonalds, or a simple search like <i>McDonalds value menu</i>).
                             </li>
 
                             <li>
-                                Click &quot;General Analysis&quot; or select a specific analysis mode for more tailored results (&quot;Brand Insights&quot; or &quot;Student Trends&quot;).
+                                Click <b>&quot;General Analysis&quot;</b> or select a <b>specific analysis mode</b> for more tailored results (&quot;Brand Insights&quot; or &quot;Student Trends&quot;).
                             </li>
 
                             <li>
@@ -97,10 +101,19 @@ const AnalyzerPage: React.FunctionComponent = () => {
                             </li>
 
                             <li>
-                                Save the analysis or start a new one anytime.
+                                <b>Save</b> the analysis or start a new one anytime.
                             </li>
                             <li>
-                                NOTE: if a search doesn&apos;t return an analysis, experiment with different terms or one of the other search modes.
+                                Click <b>&quot;Show Reddit Comments&quot;</b> to look at the raw comments that were retrieved and analyzed. These can give context to the analysis that was created and/or help refine your next search.
+                            </li>
+                            <li>
+                                When looking at Reddit Comments, the <b>score</b> figure corresponds to how popular it was based on Reddit user upvotes.
+                            </li>
+                            <li>
+                                The <b>relevance</b> figure is a figure which indicates how related the Reddit comment is to the keywords from the search terms.
+                            </li>
+                            <li>
+                                <b>NOTE:</b> if a search doesn&apos;t return an analysis, experiment with <b>different terms</b> or one of the <b>other search modes</b>.
                             </li>
                         </ul>
                     </div>
@@ -128,8 +141,8 @@ const AnalyzerPage: React.FunctionComponent = () => {
                                 <button
                                     id="general-analysis"
                                     onClick={() => setAnalysisType("general")}
-                                    // disabled={isLoading}
                                     type="submit"
+                                    disabled={isLoading}
                                     className="px-5 py-2 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500"
                                 >
                                     General Analysis
@@ -138,8 +151,8 @@ const AnalyzerPage: React.FunctionComponent = () => {
                                 <button
                                     id="brand-insights"
                                     onClick={() => setAnalysisType("brand")}
-                                    // disabled={isLoading}
                                     type="submit"
+                                    disabled={isLoading}
                                     className="px-5 py-2 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500"
                                 >
                                     Brand Insights
@@ -148,8 +161,8 @@ const AnalyzerPage: React.FunctionComponent = () => {
                                 <button
                                     id="trending-topics"
                                     onClick={() => setAnalysisType("trending")}
-                                    // disabled={isLoading}
                                     type="submit"
+                                    disabled={isLoading}
                                     className="px-5 py-2 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500"
                                 >
                                     Trending Topics
@@ -158,8 +171,8 @@ const AnalyzerPage: React.FunctionComponent = () => {
                                 <button
                                     id="education-trends"
                                     onClick={() => setAnalysisType("student")}
-                                    // disabled={isLoading}
                                     type="submit"
+                                    disabled={isLoading}
                                     className="px-5 py-2 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500"
                                 >
                                     Student Trends
@@ -184,6 +197,22 @@ const AnalyzerPage: React.FunctionComponent = () => {
                             Your analysis will appear here once you submit a search.
                         </div>
                     )}
+                </section>
+
+                {/* Expand Comments */}
+                <section>
+                    {redditComments.length > 0 && (
+                        <div className="flex justify-center mt-4">
+                            <button
+                                onClick={() => setShowComments((prev) => !prev)}
+                                className="px-5 py-2 rounded-lg text-white font-bold bg-gray-600 hover:bg-gray-500"
+                            >
+                                {showComments ? "Hide Reddit Comments" : "Show Reddit Comments"}
+                            </button>
+                        </div>
+                    )}
+
+                    {showComments && <CommentsList comments={redditComments} />}
                 </section>
             </div>
         </div>
