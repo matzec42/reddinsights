@@ -19,7 +19,7 @@ const MAX_COMMENTS_PER_POST = 10;
 const MIN_SCORE = 3;
 
 
-export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: string) => {
+export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: string, config: string) => {
 
     // helper function to convert cleanQuery (for Reddit API querying) to useable format for keyword matching
     const queryWords = cleanQuery.replace(/\+/g, ' ').toLowerCase().split(' ').filter(w => w.length > 0);
@@ -28,7 +28,12 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
     for (const sub of fetchedSubreddits) {
         try {
             // Reddit API returns lazy-loaded Listings (see Reddit, Snoowrap docs)
-            const listing = await redditRequest
+            // for now, getTop w/ a shorter time window (vs. getNew or getHot --- see docs):
+                // getTop --- score filtered, scoped by time | getNew --- true real-time signal, noisier | getHot --- blends recenty + score, no time param, can't scope time
+            const listing = config === "trending" ?
+                await redditRequest.getSubreddit(sub).getTop({ time: "day" })
+                :
+                await redditRequest
                 .getSubreddit(sub)
                 .search({
                     query: cleanQuery,

@@ -129,7 +129,7 @@ export async function POST(request: Request) {
             }, { status: 429 });
         }
 
-        const redditReplies = await getRedditReplies(fetchedSubreddits, cleanQuery);
+        const redditReplies = await getRedditReplies(fetchedSubreddits, cleanQuery, type);
         // console.log(`Number of comments/Reddit replies fetched: `, redditReplies.length);
 
         // error handling for empty array (search was valid/executed b/c subreddits were found and used to query, but no comments were fetched)

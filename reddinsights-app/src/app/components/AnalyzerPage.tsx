@@ -153,7 +153,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
                                     onClick={() => setAnalysisType("brand")}
                                     type="submit"
                                     disabled={isLoading}
-                                    className="px-5 py-2 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500"
+                                    className="px-5 py-2 rounded-lg text-white font-bold bg-amber-600 hover:bg-amber-500"
                                 >
                                     Brand Insights
                                 </button>
@@ -163,7 +163,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
                                     onClick={() => setAnalysisType("trending")}
                                     type="submit"
                                     disabled={isLoading}
-                                    className="px-5 py-2 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500"
+                                    className="px-5 py-2 rounded-lg text-white font-bold bg-emerald-600 hover:bg-emerald-500"
                                 >
                                     Trending Topics
                                 </button>
@@ -173,7 +173,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
                                     onClick={() => setAnalysisType("student")}
                                     type="submit"
                                     disabled={isLoading}
-                                    className="px-5 py-2 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500"
+                                    className="px-5 py-2 rounded-lg text-white font-bold bg-indigo-600 hover:bg-indigo-500"
                                 >
                                     Student Trends
                                 </button>
