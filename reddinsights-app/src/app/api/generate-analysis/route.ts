@@ -222,7 +222,7 @@ export async function POST(request: Request) {
         }
 
         // save finished result of full pipeline run to cache
-        cache.set(cacheKey, { data: [parsedFinalAnalysis, fetchedSubreddits, formattedReplies.split("---")], timestamp: Date.now() });
+        cache.set(cacheKey, { data: [parsedFinalAnalysis, fetchedSubreddits, formattedReplies.split("\n\n---\n\n")], timestamp: Date.now() });
 
         console.log(`Full pipeline for: ${cacheKey} | Response time: ${Date.now() - startTime}ms`);
         

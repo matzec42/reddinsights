@@ -8,12 +8,13 @@ import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 
 const COLORS = ['#41cb5b', '#fd4c0b', '#979a9c',];
 
-const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits, /* onSave */ }) => {
+const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits, comments }) => {
 
     // state for saving functionality --- useState hook not needed, as data is static and passed down as props
     // re-assigning to variables for handleSave function to access
     const analysisData = analysis;
     const subredditsData = subreddits;
+    const redditComments = comments;
     // assigning sentiment data for visualization
     const sentimentData = [
         { name: 'Positive', value: analysis.sentimentSummary.positive },
@@ -25,7 +26,7 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits, /* onS
     // LONGER TERM: edit models/DB to store numbers instead of strings, check that storage and usage is consistent in other components (DashboardCard, Card, SavedCard)
 
     const handleSaveAnalysis = async () => {
-        const payload = { analysis: analysisData, subreddits: subredditsData, visualization: sentimentData };
+        const payload = { analysis: analysisData, subreddits: subredditsData, visualization: sentimentData, comments: redditComments };
 
         try {
             const response = await fetch('/api/save-analysis', {
@@ -67,7 +68,7 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits, /* onS
                 </Link>
                 <h2 className="font-bold text-2xl">{analysis.analysisTitle}</h2>
                 <p className="text-sm text-gray-500 mt-1">{new Date(analysis.createdAt).toLocaleString()}</p>
-                <p className="text-sm text-gray-500">Comments analyzed: {analysis.commentCount}</p>
+                <p className="text-sm text-gray-500">Posts & Comments Analyzed: {analysis.commentCount}</p>
             </div>
 
             {/* Grid */}

@@ -17,7 +17,7 @@ const SavedAnalysis = async ({ params }: {params: { id: string }}) => {
         <div>
             <Navbar />
             <div className="max-w-6xl mx-auto px-4 py-6">
-                <SavedCard analysis={analysis} subreddits={analysis.subreddits}/>
+                <SavedCard analysis={analysis} subreddits={analysis.subreddits} comments={analysis.comments}/>
             </div>
         </div>
     )

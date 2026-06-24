@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import Card from '../components/Card';
 import Loading from '../components/Loading';
 import CommentsList from './CommentsList';
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const AnalyzerPage: React.FunctionComponent = () => {
     // state for search results
@@ -53,6 +53,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
             setSearchResults(fetchedAnalysis.data[0]);
             setSubreddits(fetchedAnalysis.data[1]);
             setRedditComments(fetchedAnalysis.data[2]);
+
             // resets search bar
             formRef.current?.reset();
 
@@ -63,6 +64,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
             setIsLoading(false);
         }
     }
+
 
     // Handler for resetting page/clearing card after a save --- needs to be passed down as prop to Card,
     // since save functionality lives there but state (user's search result) lives here.
@@ -143,7 +145,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
                                     onClick={() => setAnalysisType("general")}
                                     type="submit"
                                     disabled={isLoading}
-                                    className="px-5 py-2 rounded-lg text-white font-bold bg-orange-600 hover:bg-orange-500"
+                                    className="px-5 py-2 rounded-lg text-white font-bold bg-amber-600 hover:bg-amber-500"
                                 >
                                     General Analysis
                                 </button>
@@ -153,7 +155,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
                                     onClick={() => setAnalysisType("brand")}
                                     type="submit"
                                     disabled={isLoading}
-                                    className="px-5 py-2 rounded-lg text-white font-bold bg-amber-600 hover:bg-amber-500"
+                                    className="px-5 py-2 rounded-lg text-white font-bold bg-cyan-600 hover:bg-cyan-500"
                                 >
                                     Brand Insights
                                 </button>
@@ -163,7 +165,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
                                     onClick={() => setAnalysisType("trending")}
                                     type="submit"
                                     disabled={isLoading}
-                                    className="px-5 py-2 rounded-lg text-white font-bold bg-emerald-600 hover:bg-emerald-500"
+                                    className="px-5 py-2 rounded-lg text-white font-bold bg-rose-600 hover:bg-rose-500"
                                 >
                                     Trending Topics
                                 </button>
@@ -173,7 +175,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
                                     onClick={() => setAnalysisType("student")}
                                     type="submit"
                                     disabled={isLoading}
-                                    className="px-5 py-2 rounded-lg text-white font-bold bg-indigo-600 hover:bg-indigo-500"
+                                    className="px-5 py-2 rounded-lg text-white font-bold bg-emerald-600 hover:bg-emerald-500"
                                 >
                                     Student Trends
                                 </button>
@@ -187,7 +189,7 @@ const AnalyzerPage: React.FunctionComponent = () => {
                     {isLoading ? (
                         <Loading />
                     ) : searchResults ? (
-                        <Card analysis={searchResults} subreddits={subreddits} />
+                        <Card analysis={searchResults} subreddits={subreddits} comments={redditComments}/>
                     ) : errorMessage ? (
                         <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-red-600">
                             {errorMessage}
