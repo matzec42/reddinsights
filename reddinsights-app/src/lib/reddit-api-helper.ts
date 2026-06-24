@@ -29,7 +29,7 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
         try {
             // Reddit API returns lazy-loaded Listings (see Reddit, Snoowrap docs)
             // for now, getTop w/ a shorter time window (vs. getNew or getHot --- see docs):
-                // getTop --- score filtered, scoped by time | getNew --- true real-time signal, noisier | getHot --- blends recenty + score, no time param, can't scope time
+                // getTop --- score filtered, scoped by time | getNew --- true real-time signal, noisier | getHot --- blends recency + score, no time param, can't scope time
             const listing = config === "trending" ?
                 await redditRequest.getSubreddit(sub).getTop({ time: "day" })
                 :

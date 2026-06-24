@@ -22,10 +22,11 @@ export interface AnalysisType {
 export interface CardProps {
     analysis: AnalysisType;
     subreddits: string[];
-    // onSave: () => void;
+    comments: string[];
 }
 
 export interface SavedCardProps {
     analysis: AnalysisType;
     subreddits: string[];
+    comments: string[];
 }

@@ -44,7 +44,8 @@ const analysisSchema = new Schema({
     topThemes: [
         { theme: String, quote: String }
     ],
-    subreddits: [{ type: String }]
+    subreddits: [{ type: String }],
+    comments: [{ type: String }]
 });
 
 const commentSchema = new Schema({

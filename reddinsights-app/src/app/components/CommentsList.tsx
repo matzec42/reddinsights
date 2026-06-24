@@ -57,7 +57,7 @@ const CommentsList: React.FunctionComponent<CommentsListProps> = ({ comments }) 
                 {visibleComments.map((c, index) => (
                     <li key={index} className="border border-gray-100 rounded-lg p-4">
                         <p className="text-sm text-orange-600 font-medium mb-1">r/{c.subreddit.replace(/^r\//, "")}</p>
-                        <p className="text-sm text-gray-500 mb-2 line-clamp-3">{c.post}</p>
+                        <p className="text-sm text-gray-500 mb-2 line-clamp-3">Post Title: {c.post}</p>
                         <p className="text-xs text-gray-400 mb-2">
                             Score: {c.score} &middot; Relevance: {c.relevance}
                         </p>

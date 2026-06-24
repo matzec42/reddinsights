@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
 
         try {
             const body = await request.json();
-            const { analysis, subreddits, visualization } = body;
+            const { analysis, subreddits, visualization, comments } = body;
             
             // validate user --- retrieve session token from cookie 
             const cookieStore = await cookies();
@@ -65,7 +65,8 @@ export async function POST(request: NextRequest) {
                     quote: t.quote
                 })),
                 createdAt: analysis.createdAt,
-                subreddits: subreddits
+                subreddits: subreddits,
+                comments: comments
             });
 
             return NextResponse.json({ data: newAnalysis._id, success: true, message: "Analysis saved successfully!" });
