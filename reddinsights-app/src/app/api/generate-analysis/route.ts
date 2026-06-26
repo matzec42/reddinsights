@@ -8,14 +8,14 @@ import { analysisConfigs } from "@/lib/analysisConfigs";
 import { cleanQueryHelper } from "@/lib/clean-query-helper";
 import { subredditParser } from "@/lib/subreddit-parser";
 import { getRedditReplies } from "@/lib/reddit-api-helper";
-
+import { redditCommentFormatter } from "@/lib/reddit-comment-formatter";
 
 // creates Redis instance
 const redis = Redis.fromEnv();
 
 // creates a rate limit instance for Groq AI API calls
 // sliding window (looking back from present to avoid fixed window spike)
-// params are max # of requests per min (number), time in seconds for a sliding window (string)
+// params are max # of requests per minute (number), time in seconds for sliding window (string)
 const groqLimiter = new Ratelimit({
     redis,
     limiter: Ratelimit.slidingWindow(30, "60 s"),
@@ -30,7 +30,7 @@ const redditLimiter = new Ratelimit({
 });
 
 // simple in-memory caching
-// replace w/ DB caching (MongoDB)
+// FUTURE WORK: replace w/ DB caching (MongoDB)...?
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const cache = new Map<string, { data: any, timestamp: number }>();
 const CACHE_TTL = 1000 * 60 * 60;
@@ -63,10 +63,12 @@ export async function POST(request: Request) {
         }, { status: 400 })
 
 
+
         /* Sanitize query */
         // subreddits only contain letters, numbers and underscores (no apostrophes, punctuation, etc.)
         // for Reddit's API, + symbol is valid search query format (e.g., query of "McDonalds value menu" --> mcdonalds+value+menu)
         const cleanQuery = cleanQueryHelper(query);
+
 
 
         /* Cache Check (in-memory, temporary until DB version is set up) */
@@ -77,6 +79,7 @@ export async function POST(request: Request) {
             console.log(`Cache hit for: ${cacheKey} | Response time: ${Date.now() - startTime}ms`);
             return NextResponse.json({ success: true, message: "Fetch successful", data: cached.data });
         }
+
 
 
         /* First AI API call --- cheap call to fetch relevant subreddit titles */
@@ -110,6 +113,7 @@ export async function POST(request: Request) {
         }
 
 
+
         /* Reddit API call --- returns an array of comments from the fetched subreddits */
         // invokes Reddit limiter to check Redis, see if rate limit for querying Reddit API has been hit
         const { success: redditOk } = await redditLimiter.limit("global");
@@ -139,14 +143,12 @@ export async function POST(request: Request) {
         }
 
 
+
         /* Structured Compression --- filtering/normalizing for length (.filter), capping array size (.slice), formatting for the LLM (.map w/ .join) */
-        // implemented hueristics to select certain # of comments, control comment length (not too short, max length)
-        const formattedReplies = redditReplies
-            .filter(r => typeof r === "string" && r.trim().length > 20 && r.trim().length < 2000)
-            .slice(0, config.maxComments)
-            .map((r, i) => `Comment ${i + 1}: ${r.trim().slice(0, 1500)}`)
-            .join("\n\n---\n\n");
-        console.log(`Formatted Reddit comments/replies: ${formattedReplies}`);
+        // implemented heuristics to select certain # of comments, control comment length (not too short, max length)
+        const formattedReplies = redditCommentFormatter(redditReplies, config.maxComments);
+        console.log(`Formatted Reddit comments/replies string: ${formattedReplies}`);
+
 
 
         /* Second AI API call --- Sentiment Analysis (returns a JSON object with analysis results) */
@@ -157,7 +159,6 @@ export async function POST(request: Request) {
                 message: "High demand on Groq AI right now. Please try again later."
             }, { status: 429 });
         }
-
         const analyzedRaw = await groqCall({
             prompt: config.analysisPrompt(cleanQuery, formattedReplies),
             model: config.modelAnalysis,
@@ -169,26 +170,27 @@ export async function POST(request: Request) {
         try {
             console.log("Returned analysis object from Groq API fetch:", analyzedRaw);
         } catch {
-            console.error("Failed to parse Groq API response for analysis:", analyzedRaw);
+            console.error("Failed to get Groq API response for analysis:", analyzedRaw);
         }
 
-        // additional cleaning --- prompt instructions don't always fully resolve this 
+        // additional defensive cleaning --- prompt instructions don't always fully resolve this
+        // gets rid of JSON and backtick fencing if AI missed it
         const cleanedAnalysis = analyzedRaw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
         // console.log("Cleaned analysis string:", cleanedAnalysis);
 
         // final parsing analysis
-        // NOTE: parse error can occur because of incomplete/truncated string (i.e., if it's too long).
+        // NOTE: parsing error can occur because of incomplete/truncated string (i.e., if it's too long).
         // mitigate by:
             // adjusting maxTokens in the Groq API call (see lib/groq-api-helpers.ts)
             // adjust # of comments in formattedReplies (see config.maxComments in lib/analysisConfigs.ts)
             // adjust/limit length of comments in the formatting step above (e.g., .slice(0, config.maxComments)
-            // see both .trim methods in the .filter and .map steps
-            
-        // **TO-DO:** additional defensive parsing to extract the JSON object? (e.g. a regex expression that searches for everything between the backticks...?)
-        // why? --> rare edge case where model doesn't strictly follow prompt instructions (e.g., additional text or explanation after making the JSON object)
-        const parsedFinalAnalysis = JSON.parse(cleanedAnalysis);
-        // console.log("Parsed analysis object:", parsedFinalAnalysis);
+            // see both .trim methods in the .filter and .map steps in the Structured Compression block above
 
+        // TO-DO: additional defensive parsing to extract the JSON object? (e.g. a regex expression that searches for everything between the backticks...?)
+            // why? --> rare edge case where model doesn't strictly follow prompt instructions (e.g., additional text or explanation after making the JSON object)
+            // stronger models and modifying system prompt address this, but a precautionary guardrail here might be useful in future
+        const parsedFinalAnalysis = JSON.parse(cleanedAnalysis);
+        // console.log("Final parsed analysis object:", parsedFinalAnalysis);
 
         // NOTE RE:responses --- Next.js requires native Response object to be returned
         // but you can define a custom JSON object to be returned as well
