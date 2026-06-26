@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import Card from '../components/Card';
 import Loading from '../components/Loading';
 import CommentsList from './CommentsList';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 
 const AnalyzerPage: React.FunctionComponent = () => {
     // state for search results
@@ -28,6 +28,8 @@ const AnalyzerPage: React.FunctionComponent = () => {
         const type = analysisType;
 
         setIsLoading(true);
+        setRedditComments([]);
+        setShowComments(false);
 
         try {
             if (!searchTerm.trim()) {
@@ -64,16 +66,6 @@ const AnalyzerPage: React.FunctionComponent = () => {
             setIsLoading(false);
         }
     }
-
-
-    // Handler for resetting page/clearing card after a save --- needs to be passed down as prop to Card,
-    // since save functionality lives there but state (user's search result) lives here.
-    // Commented out for now...not sure about usefulness of this
-    // Card.tsx, card-component-type.ts also have related functionality for this commented out (for now)
-    // const resetAnalysis = () => {
-    //     setSearchResults(null);
-    //     setSubreddits([]);
-    // };
 
 
     return (

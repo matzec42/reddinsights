@@ -5,7 +5,10 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis"
 import { groqCall } from "@/lib/groq-api-helpers";
 import { analysisConfigs } from "@/lib/analysisConfigs";
+import { cleanQueryHelper } from "@/lib/clean-query-helper";
+import { subredditParser } from "@/lib/subreddit-parser";
 import { getRedditReplies } from "@/lib/reddit-api-helper";
+
 
 // creates Redis instance
 const redis = Redis.fromEnv();
@@ -60,10 +63,10 @@ export async function POST(request: Request) {
         }, { status: 400 })
 
 
-        // sanitize the query (e.g., no apostrophes). subreddits only contain letters, numbers and underscores
+        /* Sanitize query */
+        // subreddits only contain letters, numbers and underscores (no apostrophes, punctuation, etc.)
         // for Reddit's API, + symbol is valid search query format (e.g., query of "McDonalds value menu" --> mcdonalds+value+menu)
-        // const cleanQuery = query.trim().replace(/[^a-zA-Z0-9_-]/g, "");
-        const cleanQuery = query.trim().replace(/[^a-zA-Z0-9_\- ]/g, "").replace(/\s+/g, "+");
+        const cleanQuery = cleanQueryHelper(query);
 
 
         /* Cache Check (in-memory, temporary until DB version is set up) */
@@ -86,7 +89,6 @@ export async function POST(request: Request) {
                 message: "High demand on Groq AI right now. Please try again later."
             }, { status: 429 });
         }
-
         // Groq API call (returns a JSON string)
         const subredditList = await groqCall({
             prompt: config.subredditPrompt(cleanQuery),
@@ -94,26 +96,15 @@ export async function POST(request: Request) {
             temperature: config.temperature,
             systemPrompt: "You are a helpful assistant that returns only JSON arrays of subreddit names, no explanations, and no other output."
         });
-
         // type safety --- parse the fetched Listing of subreddit titles
         // additional defensive parsing (formatting can be inconsistent)
-        let fetchedSubreddits: string[] = [];
-
+        let fetchedSubreddits: string[]
         try {
-            // fetchedSubreddits = JSON.parse(subredditList);
-            // console.log("Parsed subreddit list:", fetchedSubreddits);
-            const extracted = subredditList.match(/"([^"\n]+)"/g);
-            const rawSubreddits = extracted ? extracted.map(s => s.replace(/"/g, '').replace(/\s+/g, '')) : [];
-            // edge case handling --- prevents runaway generation (an LLM failure --- the llama model that fetches subreddits has done this)
-            fetchedSubreddits = [...new Set(rawSubreddits)].slice(0, 5);
-            console.log("Parsed subreddit list:", fetchedSubreddits);
+            fetchedSubreddits = subredditParser(subredditList);
         } catch (error) {
-            console.error("Failed to parse subreddit response:", subredditList, {
-                error: error,
-                raw: subredditList
-            });
             return NextResponse.json({
                 success: false,
+                message: `Someting went wrong finding subreddits: ${error}`,
                 raw: subredditList
             }, { status: 500 });
         }
@@ -128,7 +119,6 @@ export async function POST(request: Request) {
                 message: "High demand on Reddit right now. Please try again later."
             }, { status: 429 });
         }
-
         const redditReplies = await getRedditReplies(fetchedSubreddits, cleanQuery, type);
         // console.log(`Number of comments/Reddit replies fetched: `, redditReplies.length);
 
@@ -147,17 +137,6 @@ export async function POST(request: Request) {
                 message: "Not enough Reddit posts found for a reliable analysis. Try modifying your search term(s) or using a different mode (e.g., General)."
             }, { status: 404 });
         }
-
-
-        // **FUTURE WORK** --- continue improving quality, relevance of fetched comments --> improve sentiment analysis
-        // why? e.g., why can't I get the posts that are on the front page of the /r/Nordstrom1901 (ANSWER: proprietary Reddit thing, regular joes don't get access to the latest & greatest...)
-        // see Groq AI Docs --> Prompting Guide
-        // consider tracking/looking at subreddit URLs on fetched replies --> for second API query, prompt to focus on most relevant & focus on customer sentiment only (not employees, ads, etc.)
-        // **KEY** --- current Reddit fetching only captures post selftext, misses much of discussion which lives in comment threads
-        // look into implementing expandReplies() in reddit-api-helper (see lib folder) to a certain depth; means more expensive Reddit calls but worth it
-        // see notes in /lib/reddit-api-helper!
-
-        // **FUTURE WORK** --- include comments in response, allow frontend user to view
 
 
         /* Structured Compression --- filtering/normalizing for length (.filter), capping array size (.slice), formatting for the LLM (.map w/ .join) */
@@ -204,9 +183,9 @@ export async function POST(request: Request) {
             // adjust # of comments in formattedReplies (see config.maxComments in lib/analysisConfigs.ts)
             // adjust/limit length of comments in the formatting step above (e.g., .slice(0, config.maxComments)
             // see both .trim methods in the .filter and .map steps
-
+            
         // **TO-DO:** additional defensive parsing to extract the JSON object? (e.g. a regex expression that searches for everything between the backticks...?)
-            // why? --> rare edge case where model doesn't strictly follow prompt instructions (e.g., additional text or explanation after making the JSON object)
+        // why? --> rare edge case where model doesn't strictly follow prompt instructions (e.g., additional text or explanation after making the JSON object)
         const parsedFinalAnalysis = JSON.parse(cleanedAnalysis);
         // console.log("Parsed analysis object:", parsedFinalAnalysis);
 
@@ -225,7 +204,7 @@ export async function POST(request: Request) {
         cache.set(cacheKey, { data: [parsedFinalAnalysis, fetchedSubreddits, formattedReplies.split("\n\n---\n\n")], timestamp: Date.now() });
 
         console.log(`Full pipeline for: ${cacheKey} | Response time: ${Date.now() - startTime}ms`);
-        
+
         return NextResponse.json(result, { status: 200 });
 
     } catch (error) {
