@@ -107,12 +107,11 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
     return allReplies
 };
 
-// create a "Trending Topics" mode: sort comments by "new" instead of "top" to capture fast-moving sentiment
 
+// √ Upvote threshold --- filter out comments below a minimum score to improve quality
+// √ Keyword relevance scoring to prioritize comments that contain the search query terms
+// √ Expose fetched comments to the user on the frontend so they can see quality and refine their search (see generate-analysis/route.ts, data is sent w/ response to frontend now)
 
 // **FUTURE WORK:** explore various options for how to query Reddit API ---  Snoowrap functions (getTop w/ a time option) to fetch Top or Hot comments for threads
-    // √ Upvote threshold --- filter out comments below a minimum score to improve quality
-    // √ Keyword relevance scoring to prioritize comments that contain the search query terms
-    
-    // Expose fetched comments to the user on the frontend so they can assess quality and refine their search
-        // (e.g., "Click to see comments fetched" so that they can get a sense of quality and modify their next search accordingly)
+    // For now, getTop({ time: "day" }) yields a "real-time" signal, but consider experimenting with others later (see notes in try/catch above)
+    // Continue to monitor LLM models --- llama-instant was decomissioned in June 2026, had to modify (see analysisConfigs.ts file)
