@@ -201,6 +201,11 @@ const config: Config = {
 
   // Whether to use watchman for file crawling
   // watchman: true,
+
+  // tells Jest that @/ points to src/ (path alias issue discovered during api route testing)
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
 };
 
 export default createJestConfig(config);
