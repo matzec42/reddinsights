@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import Card from './Card'
 
-// Mock recharts — we don't want to test its internals, just confirm our component renders around it
+// mock recharts — not testing its internals, just confirm the component renders around it
 jest.mock('recharts', () => ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     PieChart: ({ children }: any) => <div data-testid="pie-chart">{children}</div>,
@@ -11,6 +11,7 @@ jest.mock('recharts', () => ({
     Legend: () => <div />,
 }))
 
+// mock analysis object
 const mockAnalysis = {
     _id: 'mock-id-123',
     analysisTitle: 'Mock Analysis Title',
@@ -34,9 +35,10 @@ const mockAnalysis = {
     ],
 }
 
+// mocks of subreddits list and comments array
 const mockSubreddits = ['AskReddit', 'technology']
 const mockComments = ['comment one', 'comment two']
-
+// mocking fetch before each test (since it's the testing a component that renders fetched data and that has a handler for saving functionality)
 beforeEach(() => {
     global.fetch = jest.fn()
     window.alert = jest.fn()

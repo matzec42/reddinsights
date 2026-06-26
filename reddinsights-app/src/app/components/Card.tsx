@@ -25,13 +25,19 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits, commen
     // TO-DO: edit data attribute on Pie component --- pull values from sentimentSummary property and convert here, before return
     // LONGER TERM: edit models/DB to store numbers instead of strings, check that storage and usage is consistent in other components (DashboardCard, Card, SavedCard)
 
+    // variable for idempotency key for saving functionality (avoid duplicate saves)
+    const idempotencyKeyRef = React.useRef(crypto.randomUUID());
+
     const handleSaveAnalysis = async () => {
         const payload = { analysis: analysisData, subreddits: subredditsData, visualization: sentimentData, comments: redditComments };
 
         try {
             const response = await fetch('/api/save-analysis', {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Idempotency-Key": idempotencyKeyRef.current,
+                },
                 body: JSON.stringify(payload)
             });
 
