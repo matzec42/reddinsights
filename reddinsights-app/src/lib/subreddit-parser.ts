@@ -1,4 +1,4 @@
-/* Helper Function to Parse the Listing of Subreddits */
+/* Helper Function to Parse & Format the List of Subreddits */
 
 export function subredditParser(subredditList: string): string[] {
 
