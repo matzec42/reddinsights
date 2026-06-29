@@ -16,6 +16,17 @@ const Sidebar: React.FunctionComponent<SidebarProps> = ({ isOpen }) => {
                 <li><Link href="/contact">Contact</Link></li>
                 <li><Link href="/create-pdf">Create a PDF</Link></li>
                 <li><Link href="/dashboard">Dashboard</Link></li>
+                <li>
+                    <button
+                    className="cursor-pointer"
+                    onClick={async () => {
+                        await fetch('/api/auth/logout', { method: 'POST' })
+                        window.location.href = '/'
+                    }}
+                    >
+                    Logout
+                    </button>
+                </li>
             </ul>
         </div>
     );

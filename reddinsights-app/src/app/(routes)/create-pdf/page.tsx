@@ -4,7 +4,7 @@ const CreatePdfPage: React.FunctionComponent = () => {
     return (
         <div>
             <Navbar />
-            <h1>Create a PDF</h1>
+            <h1>Create a PDF --- coming soon!</h1>
         </div>
     )
 }
