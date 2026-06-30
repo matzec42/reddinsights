@@ -29,7 +29,7 @@ export async function createSession(userId: mongoose.Types.ObjectId): Promise<st
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxAge: 24 * 60 * 30,
+        maxAge: 3600,
         path: '/'
     })
 

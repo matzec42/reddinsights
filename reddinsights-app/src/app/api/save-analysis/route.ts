@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { ReddinsightsSchema } from "@/lib/models";
+import { deepSanitize } from "@/lib/deep-sanitize";
 
 export async function POST(request: NextRequest) {
     // destructure Analysis, Session models for interacting w/ DB
@@ -63,33 +64,38 @@ export async function POST(request: NextRequest) {
             value: (num.value / analysis.commentCount).toLocaleString('en-US', { style: 'percent' })
         }));
 
+        const cleanAnalysis = deepSanitize(analysis);
+        const cleanSubreddits = deepSanitize(subreddits);
+        const cleanComments = deepSanitize(comments);
+        const cleanVisualization = deepSanitize(visualization);
+
         // save analysis to MongoDB --- new document in analysis collection
         try {
             const newAnalysis = await Analysis.create({
                 userId: session.userId,
-                analysisTitle: analysis.analysisTitle,
-                commentCount: analysis.commentCount,
-                generalSummary: analysis.generalSummary,
+                analysisTitle: cleanAnalysis.analysisTitle,
+                commentCount: cleanAnalysis.commentCount,
+                generalSummary: cleanAnalysis.generalSummary,
                 sentimentSummary: {
-                    overall: analysis.sentimentSummary.overall,
-                    positive: analysis.sentimentSummary.positive,
-                    neutral: analysis.sentimentSummary.neutral,
-                    negative: analysis.sentimentSummary.negative,
-                    distribution: distribution
+                    overall: cleanAnalysis.sentimentSummary.overall,
+                    positive: cleanAnalysis.sentimentSummary.positive,
+                    neutral: cleanAnalysis.sentimentSummary.neutral,
+                    negative: cleanAnalysis.sentimentSummary.negative,
+                    distribution: cleanVisualization
                 },
-                topThemes: analysis.topThemes.map((t: { theme: string, quote: string }) => ({
+                topThemes: cleanAnalysis.topThemes.map((t: { theme: string, quote: string }) => ({
                     theme: t.theme,
                     quote: t.quote
                 })),
-                createdAt: analysis.createdAt,
-                subreddits: subreddits,
-                comments: comments,
+                createdAt: cleanAnalysis.createdAt,
+                subreddits: cleanSubreddits,
+                comments: cleanComments,
                 idempotencyKey
             });
-    
+
             return NextResponse.json({ data: newAnalysis._id, success: true, message: "Analysis saved successfully!" });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (err: any) {
             // specific catch for race condition (e.g., two nearly simultaneous requests, this handles them possibly saving with the same key)
             // this fetches the request and returns it anyway
