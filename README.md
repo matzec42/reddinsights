@@ -1,9 +1,9 @@
 # reddinsights
 An AI-powered analyzer of Reddit discussions and comments with simple visualizations.
 
-Curious about netizen sentiment about a topic? Simply enter a search term OR a subreddit topic into the analyzer and click one of the analysis buttons.
+Curious about netizen sentiment about a topic? Simply **enter a search term OR a subreddit topic** into the analyzer and click one of the analysis buttons.
 
-You'll receive an AI-powered analysis that will summarize the overall sentiment of Reddit discussion, keywords that reflect where the discussion is trending, and a handful of targeted insights which can help inform your next actions & decisions.
+You'll receive an **AI-powered analysis** that will summarize the overall sentiment of Reddit discussion, keywords that reflect where the discussion is trending, and a handful of targeted insights which can help inform your next actions & decisions.
 
 ## What It Does (So Far)
 - Users can search for insights on a topic with either a general query (e.g., McDonalds value menu) or by searching for a specific subreddit (e.g., r/McDonalds)
@@ -18,7 +18,7 @@ You'll receive an AI-powered analysis that will summarize the overall sentiment 
 
 ## Usage --- Try It Live
 
-Go to: [URL here]
+Go to: [URL to go here]
 
 **Demo Account:**
 - Email: demo@reddinsights.app
