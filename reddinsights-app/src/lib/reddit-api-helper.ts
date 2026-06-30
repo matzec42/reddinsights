@@ -1,5 +1,6 @@
 // Logic to query RedditAPI with Snoowrap
 import snoowrap from "snoowrap";
+import { normalizeText } from "./text-normalizer";
 
 // using Snoowrap library as a wrapper to do this more cleanly
 const redditRequest = new snoowrap({
@@ -24,22 +25,25 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
     // helper function to convert cleanQuery (for Reddit API querying) to useable format for keyword matching
     const queryWords = cleanQuery.replace(/\+/g, ' ').toLowerCase().split(' ').filter(w => w.length > 0);
 
+    // initializing the array to collect most relevant posts and ranked comments (including both for more stable/reliable context for LLM)
+    // function populates and returns this @ end
     const allReplies: Array<string> = [];
+
     for (const sub of fetchedSubreddits) {
         try {
             // Reddit API returns lazy-loaded Listings (see Reddit, Snoowrap docs)
             // for now, getTop w/ a shorter time window (vs. getNew or getHot --- see docs):
-                // getTop --- score filtered, scoped by time | getNew --- true real-time signal, noisier | getHot --- blends recency + score, no time param, can't scope time
+            // getTop --- score filtered, scoped by time | getNew --- true real-time signal, noisier | getHot --- blends recency + score, no time param, can't scope time
             const listing = config === "trending" ?
                 await redditRequest.getSubreddit(sub).getTop({ time: "day" })
                 :
                 await redditRequest
-                .getSubreddit(sub)
-                .search({
-                    query: cleanQuery,
-                    sort: "relevance",
-                    time: "month",
-                });
+                    .getSubreddit(sub)
+                    .search({
+                        query: cleanQuery,
+                        sort: "relevance",
+                        time: "month",
+                    });
 
             // copy Listing to make it an iterable array
             const postsArray = [...listing].slice(0, TOP_POSTS);
@@ -49,9 +53,14 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
                 // console.log(`Post: ${post.title} | selftext length: ${post.selftext?.length}`);
                 if (post.selftext && post.selftext.trim() !== "") {
                     // console.log(`Post from r/${sub}:`, post.title);
+
+                    // sanitize post titles (since they are pushed into the allReplies array)
+                    const cleanPostTitle = normalizeText(post.title);
+                    const cleanPostSelfText = normalizeText(post.selftext);
+
                     // push post's title plus its selftext (i.e., the post's first comment); formatting it for better LLM analysis
                     allReplies.push(`
-                        TITLE: ${post.title}\nBODY: ${post.selftext}`);
+                        TITLE: ${cleanPostTitle}\nBODY: ${cleanPostSelfText}`);
                 }
 
                 // capture top comments (try/catch and console.warn so it doesn't kill the whole loop)
@@ -68,21 +77,34 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
                         .filter((comment: any) => comment.score >= MIN_SCORE)
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         .map((comment: any) => {
-                            const body = comment.body.toLowerCase();
-                            const relevanceScore = queryWords.filter(word => body.includes(word)).length;
-                            return { ...comment, relevanceScore };
+                            const cleanBody = normalizeText(comment.body);
+
+                            // temporary dev logging to see difference in any malformed/non-UTF8 text being processed
+                            // if (cleanBody !== comment.body) {
+                            //     console.warn({
+                            //         removed: comment.body.length - cleanBody.length,
+                            //         previewBefore: comment.body.substring(0, 100),
+                            //         previewAfter: cleanBody.substring(0, 100)
+                            //     });
+                            // }
+
+                            const relevanceScore = queryWords.filter(word => cleanBody.includes(word)).length;
+                            return { ...comment, body: cleanBody, relevanceScore };
                         })
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         .sort((a: any, b: any) => b.relevanceScore - a.relevanceScore || b.score - a.score)
                         .slice(0, MAX_COMMENTS_PER_POST);
 
-                    for (const comment of topComments) {
+                    for (const comm of topComments) {
+                        // sanitizing sub as well
+                        const cleanSub = normalizeText(sub);
+
                         allReplies.push(`
-                                SUBREDDIT: r/${sub}
-                                \nPOST: ${post.title}
-                                \nCOMMENT SCORE: ${comment.score}
-                                \nRELEVANCE: ${comment.relevanceScore}
-                                \nCOMMENT: ${comment.body}
+                                SUBREDDIT: r/${cleanSub}
+                                \nPOST: ${normalizeText(post.title)}
+                                \nCOMMENT SCORE: ${comm.score}
+                                \nRELEVANCE: ${comm.relevanceScore}
+                                \nCOMMENT: ${comm.body}
                             `);
                     }
 
@@ -113,5 +135,5 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
 // √ Expose fetched comments to the user on the frontend so they can see quality and refine their search (see generate-analysis/route.ts, data is sent w/ response to frontend now)
 
 // **FUTURE WORK:** explore various options for how to query Reddit API ---  Snoowrap functions (getTop w/ a time option) to fetch Top or Hot comments for threads
-    // For now, getTop({ time: "day" }) yields a "real-time" signal, but consider experimenting with others later (see notes in try/catch above)
-    // Continue to monitor LLM models --- llama-instant was decomissioned in June 2026, had to modify (see analysisConfigs.ts file)
+// For now, getTop({ time: "day" }) yields a "real-time" signal, but consider experimenting with others later (see notes in try/catch above)
+// Continue to monitor LLM models --- llama-instant was decomissioned in June 2026, had to modify (see analysisConfigs.ts file)

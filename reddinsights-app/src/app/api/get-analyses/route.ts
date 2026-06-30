@@ -28,13 +28,13 @@ export async function GET(request: NextRequest) {
         );
 
         if (!analyses) {
-                    console.error("Error fetching analyses from DB");
-                    return NextResponse.json({
-                        success: false,
-                        message: "Something went wrong while fetching your analyses. Please try again later."
-                    }, { status: 500 });
-                }
-        
+            console.error("Error fetching analyses from DB");
+            return NextResponse.json({
+                success: false,
+                message: "Something went wrong while fetching your analyses. Please try again later."
+            }, { status: 500 });
+        }
+
         return NextResponse.json({ data: analyses, success: true, message: "Analyses retrieved successfully" });
 
     } catch (error) {

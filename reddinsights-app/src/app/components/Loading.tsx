@@ -5,12 +5,14 @@ import { useState, useEffect } from 'react';
 const MESSAGES = [
     "Reddinsights is getting to work...",
     "Discovering relevant subreddits...",
-    "Fetching Reddit comments...",
+    "Fetching Reddit discussions...",
+    "Parsing and formatting comments...",
     "Analyzing sentiment...",
     "Still working...",
     "Almost done...",
     "Finishing analysis...",
-    "Thanks for your patience..."
+    "Thanks for your patience...",
+    "Nearly there..."
 ];
 
 const Loading: React.FunctionComponent = () => {
