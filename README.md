@@ -13,15 +13,15 @@ You'll receive an **AI-powered analysis** that will summarize the overall sentim
 - Reddinsights uses AI to discover relevant subreddits, retrieve and rank comments from active posts in these subreddits (based on Reddit user upvotes, keyword relevance)
 - Reddinsights performs an LLM-powered  analysis utilizing this data, presenting things like a general summary, top discussion themes with supporting comments, visualization of Reddit user sentiment, and links to the subreddits---all in an easy-to-read card display
 
-![Card creation](./assets/analysis-card.gif)
+![Card creation](./reddinsights-app/assets/analysis-card.gif)
 
 - Users can also show/hide the comments that were aggregated and used for the analysis to get a direct look at what informed the AI's results
 
-![Show comments](./assets/show-comments.gif)
+![Show comments](./reddinsights-app/assets/show-comments.gif)
 
 - Basic save and delete functionality (CRUD)
 
-![Save functionality](./assets/save-sentiment)
+![Save functionality](./reddinsights-app/assets/save-sentiment)
 
 - Quick data retrieval with document-based storage (MongoDB)
 - Session-based authentication (email and password), encrypted with bcrypt
