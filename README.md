@@ -21,7 +21,7 @@ You'll receive an **AI-powered analysis** that will summarize the overall sentim
 
 - Basic save and delete functionality (CRUD)
 
-![Save functionality](./reddinsights-app/assets/save-sentiment)
+![Save functionality](./reddinsights-app/assets/save-sentiment.gif)
 
 - Quick data retrieval with document-based storage (MongoDB)
 - Session-based authentication (email and password), encrypted with bcrypt
