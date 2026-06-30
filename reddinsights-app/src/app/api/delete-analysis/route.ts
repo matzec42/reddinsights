@@ -45,7 +45,7 @@ export async function DELETE(request: NextRequest) {
             const deleteAnalysis = await Analysis.findOneAndDelete(
                 { _id: id }
             )
-            console.log("In delete API route, MongoDB response for deleteAnalysis: ", deleteAnalysis);
+            // console.log("In delete API route, MongoDB response for deleteAnalysis: ", deleteAnalysis);
 
             return NextResponse.json({ success: true, message: "Analysis successfully deleted." })
         
