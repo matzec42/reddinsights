@@ -12,13 +12,6 @@ type AnalysisConfig = {
     maxComments: number;
 };
 
-// **FUTURE WORK**: experiment with config options (tokens, temperature) for the differents types; simplify/reduce directions without sacrificing quality of AI output; even try different models
-    // Using more efficient model (8b-instant) for the basic task of finding subreddits --- less expensive
-    // Using more robust model (70b-versatile) for the actual analysis of the comments --- more expensive, but want higher quality output for the analysis
-    // Even w/ rate limiting, token usage for analysis (llama-3.3-70b-versatile) is currently a bottleneck,
-    // experimenting with other models (llama-3.1-8b-instant, meta-llama/llama-4-scout-17b-16e-instruct, and openai/gpt-oss-120b) that have higher TPM and TPD.
-    // Especially TPD so have a higher ceiling (more requests can be made per day) w/o sacrificing quality
-
 
 export const analysisConfigs: Record<string, AnalysisConfig> = {
     /* General Analysis Config */
@@ -64,8 +57,8 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
         },
 
         systemPrompt: "Return ONLY valid JSON. No markdown. No backticks.",
-        modelSubreddit: "llama-3.3-70b-versatile", /* "openai/gpt-oss-20b", */
-        modelAnalysis: "meta-llama/llama-4-scout-17b-16e-instruct", /*"llama-3.3-70b-versatile"*/
+        modelSubreddit: "llama-3.3-70b-versatile", 
+        modelAnalysis: "meta-llama/llama-4-scout-17b-16e-instruct", 
         temperature: 0.3,
         maxComments: 30,
         },
@@ -114,8 +107,8 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
         },
 
     systemPrompt: "Return ONLY valid JSON. No markdown. No backticks.",
-    modelSubreddit: "llama-3.3-70b-versatile", /* "openai/gpt-oss-20b", */
-    modelAnalysis: "meta-llama/llama-4-scout-17b-16e-instruct", /*"llama-3.3-70b-versatile", */
+    modelSubreddit: "llama-3.3-70b-versatile", 
+    modelAnalysis: "meta-llama/llama-4-scout-17b-16e-instruct", 
     temperature: 0.3,
     maxComments: 30,
     },
@@ -164,7 +157,7 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
         },
 
     systemPrompt: "Return ONLY valid JSON. No markdown. No backticks.",
-    modelSubreddit: "llama-3.3-70b-versatile", /* "openai/gpt-oss-20b", */
+    modelSubreddit: "llama-3.3-70b-versatile", 
     modelAnalysis: "meta-llama/llama-4-scout-17b-16e-instruct",
     temperature: 0.3,
     maxComments: 30,
@@ -209,7 +202,7 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
         `;
         },
     systemPrompt: "Return ONLY valid JSON. No markdown. No backticks.",
-    modelSubreddit: "llama-3.3-70b-versatile", /* "openai/gpt-oss-20b", */
+    modelSubreddit: "llama-3.3-70b-versatile",
     modelAnalysis: "meta-llama/llama-4-scout-17b-16e-instruct",
     temperature: 0.4,
     maxComments: 30,

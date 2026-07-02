@@ -6,7 +6,7 @@
 
 // Reason:
 // Extra validation layer before saving LLM-produced analyses (see api/save-analysis/route.ts)
-// Possible source of UTF-8 error in MongoDB Atlas
+// Possible source of the UTF-8 error in MongoDB Atlas
 
 import { normalizeText } from "./text-normalizer";
 
