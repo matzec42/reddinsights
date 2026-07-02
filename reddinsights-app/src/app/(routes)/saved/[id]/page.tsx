@@ -2,7 +2,7 @@ import SavedCard from "@/app/components/SavedCard";
 import Navbar from "@/app/components/Navbar";
 import { ReddinsightsSchema } from "@/lib/models";
 
-const SavedAnalysis = async ({ params }: {params: { id: string }}) => {
+const SavedAnalysis = async ({ params }: {params: Promise<{ id: string }>}) => {
     // access params from URL
     const { id } = await params;
     const { Analysis } = ReddinsightsSchema;
