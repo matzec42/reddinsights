@@ -12,7 +12,7 @@ const redditRequest = new snoowrap({
 });
 
 // to avoid type issues with Listing returns from Reddit API
-redditRequest.config({ proxies: false });
+// redditRequest.config({ proxies: false });
 
 // variables for post & comment extraction, filtering, sorting --- fine tune these depending on comment quality
 const TOP_POSTS = 7;
