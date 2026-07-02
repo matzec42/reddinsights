@@ -2,6 +2,8 @@
 import snoowrap from "snoowrap";
 import { normalizeText } from "./text-normalizer";
 
+// manually fetch a Reddit access token using the Reddit API, then use it to create a Snoowrap client instance
+// Snoowrap was failing to do this automatically, so this is a workaround to get valid Reddit API token
 async function getRedditClient() {
     const credentials = Buffer.from(
         `${process.env.REDDIT_CLIENT_ID}:${process.env.REDDIT_CLIENT_SECRET}`
@@ -25,8 +27,6 @@ async function getRedditClient() {
     });
 }
 
-// invoke getRedditClient to give Snoowrap a valid token before querying Reddit API
-const redditRequest = await getRedditClient();
 
 // using Snoowrap library as a wrapper to do this more cleanly
 // const redditRequest = new snoowrap({
@@ -47,6 +47,8 @@ const MIN_SCORE = 3;
 
 
 export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: string, config: string) => {
+    // invoke getRedditClient to give Snoowrap a valid token before querying Reddit API
+    const redditRequest = await getRedditClient();
 
     // helper function to convert cleanQuery (for Reddit API querying) to useable format for keyword matching
     const queryWords = cleanQuery.replace(/\+/g, ' ').toLowerCase().split(' ').filter(w => w.length > 0);
