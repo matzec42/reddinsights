@@ -96,7 +96,7 @@ const SavedCard: React.FunctionComponent<SavedCardProps> = ({ analysis, subreddi
                                 cy={130}
                                 outerRadius={90}
                                 dataKey="value"
-                                label={({ name, value }) => `${name}:\n${(value / analysis.commentCount * 100).toFixed(0)}%`}
+                                label={({ value }) => `${(value / analysis.commentCount * 100).toFixed(0)}%`}
                             >
                                 {sentimentData.map((_, index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index]} />
