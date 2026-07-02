@@ -190,7 +190,7 @@ export async function POST(request: Request) {
             // why? --> rare edge case where model doesn't strictly follow prompt instructions (e.g., additional text or explanation after making the JSON object)
             // stronger models and modifying system prompt address this, but a precautionary guardrail here might be useful in future
         const parsedFinalAnalysis = JSON.parse(cleanedAnalysis);
-        // console.log("Final parsed analysis object:", parsedFinalAnalysis);
+        console.log("Final parsed analysis object:", parsedFinalAnalysis);
 
         // NOTE RE:responses --- Next.js requires native Response object to be returned
         // but you can define a custom JSON object to be returned as well

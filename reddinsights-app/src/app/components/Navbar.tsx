@@ -24,7 +24,7 @@ const Navbar: React.FunctionComponent = () => {
                 />
                 
                 <Link href="/dashboard">
-                    <h1 className="text-4xl font-bold mb-6 mt-4">Reddinsights</h1>
+                    <h1 className="text-4xl font-bold mb-6 mt-4">reddinsights</h1>
                 </Link>
 
                 <Link href="/analyzer">

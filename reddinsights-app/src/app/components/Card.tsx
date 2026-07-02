@@ -15,7 +15,7 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits, commen
     const analysisData = analysis;
     const subredditsData = subreddits;
     const redditComments = comments;
-    // assigning sentiment data for visualization
+    // assigning sentiment data for visualization --- fix this longer term (see SavedCard, DashboardCard components) --- ideally, sentimentSummary would be stored as numbers in DB, not strings
     const sentimentData = [
         { name: 'Positive', value: analysis.sentimentSummary.positive },
         { name: 'Negative', value: analysis.sentimentSummary.negative },
@@ -92,7 +92,7 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits, commen
                             cy={130}
                             outerRadius={90}
                             dataKey="value"
-                            label={({ name, value }) => `${name}:\n${(value / analysis.commentCount * 100).toFixed(0)}%`}
+                            label={({ value }) => `${(value / analysis.commentCount * 100).toFixed(0)}%`}
                         >
                             {sentimentData.map((_, index) => (
                                 <Cell key={`cell-${index}`} fill={COLORS[index]} />

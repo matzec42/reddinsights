@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
         // fetch analyses from MongoDB --- all analyses documents associated w/ user
         const analyses = await Analysis.find(
             { userId: session.userId },
-            { analysisTitle: 1, sentimentSummary: 1, createdAt: 1 },
+            { analysisTitle: 1, sentimentSummary: 1, createdAt: 1, commentCount: 1 },
             { sort: { createdAt: -1 }, limit: 20 }
         );
 
