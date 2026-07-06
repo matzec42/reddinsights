@@ -5,32 +5,10 @@ Curious about netizen sentiment about a topic? Simply **enter a search term OR a
 
 You'll receive an **AI-powered analysis** that will summarize the overall sentiment of Reddit discussion, keywords that reflect where the discussion is trending, and a handful of targeted insights which can help inform your next actions & decisions.
 
-## What It Does (So Far)
-- Users can search for insights on a topic with either a general query (e.g., McDonalds value menu) or by searching for a specific subreddit (e.g., r/McDonalds)
-
-![Search flow](./reddinsights-app/assets/enter-search.gif)
-
-- Reddinsights uses AI to discover relevant subreddits, retrieve and rank comments from active posts in these subreddits (based on Reddit user upvotes, keyword relevance)
-- Reddinsights performs an LLM-powered  analysis utilizing this data, presenting things like a general summary, top discussion themes with supporting comments, visualization of Reddit user sentiment, and links to the subreddits---all in an easy-to-read card display
-
-![Card creation](./reddinsights-app/assets/analysis-card.gif)
-
-- Users can also show/hide the comments that were aggregated and used for the analysis to get a direct look at what informed the AI's results
-
-![Show comments](./reddinsights-app/assets/show-comments.gif)
-
-- Basic save and delete functionality (CRUD)
-
-![Save functionality](./reddinsights-app/assets/save-sentiment.gif)
-
-- Quick data retrieval with document-based storage (MongoDB)
-- Session-based authentication (email and password), encrypted with bcrypt
-- In-memory caching (short-lived to balance efficiency with data freshness/new Reddit discussion)
-- Rate limiting with a cloud-based Upstash/Redis instance
 
 ## Usage --- Try It Live
 
-Go to: [URL to go here]
+Go to: https://reddinsights.vercel.app/
 
 **Demo Account:**
 - Email: demo@reddinsights.app
@@ -39,8 +17,33 @@ Go to: [URL to go here]
 Or create your own account.
 
 
+## What It Does (So Far)
+- Users can search for insights on a topic with either a general query (e.g., McDonalds value menu) or by searching for a specific subreddit (e.g., r/McDonalds):
+
+![Search flow](./reddinsights-app/assets/enter-search.gif)
+
+- Reddinsights uses AI to discover relevant subreddits, retrieve and rank comments from active posts in these subreddits (based on Reddit user upvotes, keyword relevance)
+- Reddinsights performs an LLM-powered  analysis utilizing this data, presenting things like a general summary, top discussion themes with supporting comments, visualization of Reddit user sentiment, and links to the subreddits---all in an easy-to-read card display:
+
+![Card creation](./reddinsights-app/assets/analysis-card.gif)
+
+- Users can also show/hide the comments that were aggregated and used for the analysis to get a direct look at what informed the AI's results:
+
+![Show comments](./reddinsights-app/assets/show-comments.gif)
+
+- Basic save and delete functionality (CRUD):
+
+![Save functionality](./reddinsights-app/assets/save-sentiment.gif)
+
+- Quick data retrieval with document-based storage (MongoDB)
+- Session-based authentication (email and password), encrypted with bcrypt
+- In-memory caching (short-lived to balance efficiency with data freshness/new Reddit discussion)
+- Rate limiting with a cloud-based Upstash/Redis instance
+
+
 ## Local Set Up
-**Requirements:** Next.js, Groq AI API key, Reddit account and API credentials (client ID, secret), a MongoDB cluster.
+
+**Requirements:** Next.js, Groq AI API key, Reddit account and API credentials (client ID, secret), a MongoDB cluster, an Upstash/Redis instance.
 
 1. Clone the repo
 2. `npm install`
@@ -66,4 +69,4 @@ Or create your own account.
 
 ## Stack
 
-- Next.js, Groq AI, Recharts, MongoDB, Snoowrap (JS library for Reddit API), Upstash/Redis
+### [Next.js](https://nextjs.org?utm_source=chatgpt.com) | [Groq AI](https://groq.com?utm_source=chatgpt.com) | [Recharts](https://recharts.org?utm_source=chatgpt.com) | [MongoDB](https://www.mongodb.com?utm_source=chatgpt.com) | [Snoowrap](https://not-an-aardvark.github.io/snoowrap/) | [Upstash/Redis](https://upstash.com?utm_source=chatgpt.com)

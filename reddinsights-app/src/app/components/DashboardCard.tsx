@@ -6,9 +6,6 @@ const COLORS = ['#41cb5b', '#fd4c0b', '#979a9c',];
 
 const DashboardCard: React.FunctionComponent<{ analysis: AnalysisType }> = ({ analysis }) => {
 
-    // TO-DO: edit data attribute on Pie component --- pull values from sentimentSummary property and convert here, before return
-    // LONGER TERM: edit models/DB to store numbers instead of strings, check that storage and usage is consistent in other components (DashboardCard, Card, SavedCard)
-
     const sentimentData = [
         { name: 'Positive', value: analysis.sentimentSummary.positive },
         { name: 'Negative', value: analysis.sentimentSummary.negative },

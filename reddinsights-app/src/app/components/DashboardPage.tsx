@@ -35,7 +35,6 @@ const DashboardPage: React.FunctionComponent = () => {
 
                 // update state --- fetched all saved analyses
                 setUserAnalyses(data.data);
-                // console.log("Fetched analyses:", data.data);
                 // update state --- shows first batch of cards
                 setDisplayedCards(data.data.slice(0, CARDS_PER_PAGE));
                 // update state --- evaluates to Boolean (flag for if the full list is greater than cards per page, i.e. there are more to load)
@@ -54,7 +53,6 @@ const DashboardPage: React.FunctionComponent = () => {
     
     // Each time loadMore runs, it advances one page and slices a bigger chunk of array from userAnalyses (the full list)
     // useCallback caches the callback function so it isn't re-creating loadMore with every re-render (and so that the useEffect below isn't infinitely re-rendering, since it's in its dependency array)
-    // Put another way: "give me back the same function (loadMore) every time unless page or userAnalyses changes"
     const loadMore = useCallback(() => {
         const nextPage = page + 1;
         const nextCards = userAnalyses.slice(0, nextPage * CARDS_PER_PAGE);
@@ -67,7 +65,7 @@ const DashboardPage: React.FunctionComponent = () => {
     // useEffect --- purpose is to set up and tear down the observer 
     // observer is assigned a new instance of an observer (IntersectionObserver is a browser API, job is to watch whether an element is visible in the viewport)
         // invokes loadMore when sentintel comes into viewport
-        // threshold arg -- "only trigger when the sentinel is 100% visible",
+        // threshold arg -- "only trigger when the sentinel is 100% visible"
     useEffect(() => {
         if (!hasMore) return;
         const observer = new IntersectionObserver(

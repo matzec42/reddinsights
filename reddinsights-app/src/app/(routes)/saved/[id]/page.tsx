@@ -2,12 +2,12 @@ import SavedCard from "@/app/components/SavedCard";
 import Navbar from "@/app/components/Navbar";
 import { ReddinsightsSchema } from "@/lib/models";
 
-const SavedAnalysis = async ({ params }: {params: { id: string }}) => {
-    // params works like the useParams hook in regular React, grabs from URL
+const SavedAnalysis = async ({ params }: {params: Promise<{ id: string }>}) => {
+    // access params from URL
     const { id } = await params;
     const { Analysis } = ReddinsightsSchema;
 
-    // parsing to pass simple/clean JS objects as props (was throwing errors)
+    // parsing to pass simple/clean JS objects as props (avoids errors)
     const rawAnalysis = await Analysis.findById(id).lean();
     const analysis = JSON.parse(JSON.stringify(rawAnalysis));
 

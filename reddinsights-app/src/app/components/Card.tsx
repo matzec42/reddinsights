@@ -15,15 +15,12 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits, commen
     const analysisData = analysis;
     const subredditsData = subreddits;
     const redditComments = comments;
-    // assigning sentiment data for visualization --- fix this longer term (see SavedCard, DashboardCard components) --- ideally, sentimentSummary would be stored as numbers in DB, not strings
+    // assigning sentiment data for visualization
     const sentimentData = [
         { name: 'Positive', value: analysis.sentimentSummary.positive },
         { name: 'Negative', value: analysis.sentimentSummary.negative },
         { name: 'Neutral', value: analysis.sentimentSummary.neutral },
     ];
-
-    // TO-DO: edit data attribute on Pie component --- pull values from sentimentSummary property and convert here, before return
-    // LONGER TERM: edit models/DB to store numbers instead of strings, check that storage and usage is consistent in other components (DashboardCard, Card, SavedCard)
 
     // variable for idempotency key for saving functionality (avoid duplicate saves)
     const idempotencyKeyRef = React.useRef(crypto.randomUUID());
@@ -45,11 +42,7 @@ const Card: React.FunctionComponent<CardProps> = ({ analysis, subreddits, commen
                 alert("Failed to save analysis. Please try again.");
                 return;
             }
-            // console.log(`Analysis saved: ${response.json()}`);
             alert("Analysis saved successfully!");
-
-            // triggers state reset (form, display of card) in AnalyzerPage
-            // onSave();
 
         } catch (err) {
             console.error("Error saving analysis", err);

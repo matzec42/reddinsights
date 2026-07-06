@@ -2,17 +2,43 @@
 import snoowrap from "snoowrap";
 import { normalizeText } from "./text-normalizer";
 
+// manually fetch a Reddit access token using the Reddit API, then use it to create a Snoowrap client instance
+// Snoowrap was failing to do this automatically, so this is a workaround to get valid Reddit API token
+async function getRedditClient() {
+    const credentials = Buffer.from(
+        `${process.env.REDDIT_CLIENT_ID}:${process.env.REDDIT_CLIENT_SECRET}`
+    ).toString('base64');
+
+    const response = await fetch('https://www.reddit.com/api/v1/access_token', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Basic ${credentials}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': process.env.REDDIT_USER_AGENT || 'reddinsights/1.0'
+        },
+        body: `grant_type=password&username=${process.env.REDDIT_USERNAME}&password=${process.env.REDDIT_PASSWORD}`
+    });
+
+    const data = await response.json();
+
+    return new snoowrap({
+        userAgent: process.env.REDDIT_USER_AGENT || 'reddinsights/1.0',
+        accessToken: data.access_token
+    });
+}
+
+
 // using Snoowrap library as a wrapper to do this more cleanly
-const redditRequest = new snoowrap({
-    clientId: process.env.REDDIT_CLIENT_ID,
-    clientSecret: process.env.REDDIT_CLIENT_SECRET,
-    username: process.env.REDDIT_USERNAME,
-    password: process.env.REDDIT_PASSWORD,
-    userAgent: process.env.REDDIT_USER_AGENT || 'my default user agent'
-});
+// const redditRequest = new snoowrap({
+//     clientId: process.env.REDDIT_CLIENT_ID,
+//     clientSecret: process.env.REDDIT_CLIENT_SECRET,
+//     username: process.env.REDDIT_USERNAME,
+//     password: process.env.REDDIT_PASSWORD,
+//     userAgent: process.env.REDDIT_USER_AGENT || 'my default user agent'
+// });
 
 // to avoid type issues with Listing returns from Reddit API
-redditRequest.config({ proxies: false });
+// redditRequest.config({ proxies: false });
 
 // variables for post & comment extraction, filtering, sorting --- fine tune these depending on comment quality
 const TOP_POSTS = 7;
@@ -21,6 +47,8 @@ const MIN_SCORE = 3;
 
 
 export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: string, config: string) => {
+    // invoke getRedditClient to give Snoowrap a valid token before querying Reddit API
+    const redditRequest = await getRedditClient();
 
     // helper function to convert cleanQuery (for Reddit API querying) to useable format for keyword matching
     const queryWords = cleanQuery.replace(/\+/g, ' ').toLowerCase().split(' ').filter(w => w.length > 0);
@@ -63,9 +91,7 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
             console.log(`r/${sub}: ${postsArray.length} posts found`);
 
             for (const post of postsArray) {
-                // console.log(`Post: ${post.title} | selftext length: ${post.selftext?.length}`);
                 if (post.selftext && post.selftext.trim() !== "") {
-                    // console.log(`Post from r/${sub}:`, post.title);
 
                     // sanitize post titles (since they are pushed into the allReplies array)
                     const cleanPostTitle = normalizeText(post.title);
@@ -92,15 +118,6 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         .map((comment: any) => {
                             const cleanBody = normalizeText(comment.body);
-
-                            // temporary dev logging to see difference in any malformed/non-UTF8 text being processed
-                            // if (cleanBody !== comment.body) {
-                            //     console.warn({
-                            //         removed: comment.body.length - cleanBody.length,
-                            //         previewBefore: comment.body.substring(0, 100),
-                            //         previewAfter: cleanBody.substring(0, 100)
-                            //     });
-                            // }
 
                             const relevanceScore = queryWords.filter(word => cleanBody.includes(word)).length;
                             return { ...comment, body: cleanBody, relevanceScore };

@@ -30,7 +30,6 @@ const redditLimiter = new Ratelimit({
 });
 
 // simple in-memory caching
-// FUTURE WORK: replace w/ DB caching (MongoDB)...?
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const cache = new Map<string, { data: any, timestamp: number }>();
 const CACHE_TTL = 1000 * 60 * 60;
@@ -147,7 +146,6 @@ export async function POST(request: Request) {
         /* Structured Compression --- filtering/normalizing for length (.filter), capping array size (.slice), formatting for the LLM (.map w/ .join) */
         // implemented heuristics to select certain # of comments, control comment length (not too short, max length)
         const formattedReplies = redditCommentFormatter(redditReplies, config.maxComments);
-        console.log(`Formatted Reddit comments/replies string: ${formattedReplies}`);
 
 
 
@@ -176,26 +174,11 @@ export async function POST(request: Request) {
         // additional defensive cleaning --- prompt instructions don't always fully resolve this
         // gets rid of JSON and backtick fencing if AI missed it
         const cleanedAnalysis = analyzedRaw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
-        // console.log("Cleaned analysis string:", cleanedAnalysis);
 
-        // final parsing analysis
-        // NOTE: parsing error can occur because of incomplete/truncated string (i.e., if it's too long).
-        // mitigate by:
-            // adjusting maxTokens in the Groq API call (see lib/groq-api-helpers.ts)
-            // adjust # of comments in formattedReplies (see config.maxComments in lib/analysisConfigs.ts)
-            // adjust/limit length of comments in the formatting step above (e.g., .slice(0, config.maxComments)
-            // see both .trim methods in the .filter and .map steps in the Structured Compression block above
-
-        // TO-DO: additional defensive parsing to extract the JSON object? (e.g. a regex expression that searches for everything between the backticks...?)
-            // why? --> rare edge case where model doesn't strictly follow prompt instructions (e.g., additional text or explanation after making the JSON object)
-            // stronger models and modifying system prompt address this, but a precautionary guardrail here might be useful in future
         const parsedFinalAnalysis = JSON.parse(cleanedAnalysis);
         console.log("Final parsed analysis object:", parsedFinalAnalysis);
 
-        // NOTE RE:responses --- Next.js requires native Response object to be returned
-        // but you can define a custom JSON object to be returned as well
-        // define result object first, wrap it in NextResponse
-        // status codes, headers, etc. a part of options object (second obj)
+        // return final result object, subreddit list and comments
         const result = {
             success: true,
             message: "Fetch successful",

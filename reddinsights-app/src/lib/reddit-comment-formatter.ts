@@ -10,7 +10,5 @@ export function redditCommentFormatter(comments: string[], maxComments: number):
     .map((r, i) => `Comment ${i + 1}: ${r.trim().slice(0, 1500)}`)
     .join("\n\n---\n\n");
 
-    // console.log(`Formatted Reddit comments/replies string: ${result}`);
-
     return result
 }

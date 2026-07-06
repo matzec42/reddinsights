@@ -37,8 +37,6 @@ export async function groqCall({
 
     const groqContent = response.choices[0]?.message?.content?.trim();
     console.log("Token usage:", JSON.stringify(response.usage, null, 2));
-    // console.log("Raw Groq response:", groqContent);
-    // console.log("Groq response type:", typeof groqContent);
 
 
     // error handling is in route.ts, as this needs to return a string
