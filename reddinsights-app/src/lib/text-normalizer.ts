@@ -1,6 +1,6 @@
 /* Text Normalizer Helper Function */
 // To be used per
-// see Reddit API helper function (comment fetching, normalizing, ranking); perhaps Reddit formatting helper (?)
+// see Reddit API helper function (comment fetching, normalizing, ranking in lib/reddit-api-helper)
 
 // Reason:
 // MongoDB was still successfully storing created analyses, fetching for the DashboardPage, etc., but there was a data hygiene issue
