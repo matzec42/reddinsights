@@ -45,7 +45,7 @@ const analysisSchema = new Schema({
         { theme: String, quote: String }
     ],
     subreddits: [{ type: String }],
-    comments: [{ type: String }],
+    comments: [{ type: Object }],
     idempotencyKey: { type: String, unique: true } 
 });
 
