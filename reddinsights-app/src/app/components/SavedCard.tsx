@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { isRedirectError } from 'next/dist/client/components/redirect-error';
-import { SavedCardProps } from '../../types/card-component-types.ts/card-component-type';
+import { SavedCardProps } from '../../types/card-component-types/card-component-type';
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 import CommentsList from '../components/CommentsList'
 
