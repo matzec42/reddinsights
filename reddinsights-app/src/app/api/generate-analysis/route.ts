@@ -122,7 +122,8 @@ export async function POST(request: Request) {
                 message: "High demand on Reddit right now. Please try again later."
             }, { status: 429 });
         }
-        const redditReplies = await getRedditReplies(fetchedSubreddits, cleanQuery, type);
+        const { allReplies: redditReplies, structuredComments } = await getRedditReplies(fetchedSubreddits, cleanQuery, type);
+        // console.log(`Number of comments/Reddit replies fetched: `, redditReplies.length);
 
         // error handling for empty array (search was valid/executed b/c subreddits were found and used to query, but no comments were fetched)
         // message on response object gets rendered on frontend
@@ -132,7 +133,7 @@ export async function POST(request: Request) {
                 message: "Hmm, couldn't find Reddit posts for this search. Try modifying your search term(s) or using a different mode (e.g., General)."
             }, { status: 404 });
         }
-        // edge case --- insufficient comments in array (AI will hallucinate otherwise)
+        // edge case --- insufficient comments in array (AI may hallucinate otherwise)
         if (redditReplies.length < 3) {
             return NextResponse.json({
                 success: false,
@@ -181,11 +182,13 @@ export async function POST(request: Request) {
         const result = {
             success: true,
             message: "Fetch successful",
-            data: [parsedFinalAnalysis, fetchedSubreddits, formattedReplies.split("---")]
+            data: [parsedFinalAnalysis, fetchedSubreddits, structuredComments]
         }
 
         // save finished result of full pipeline run to cache
-        cache.set(cacheKey, { data: [parsedFinalAnalysis, fetchedSubreddits, formattedReplies.split("\n\n---\n\n")], timestamp: Date.now() });
+        cache.set(cacheKey, { data: [parsedFinalAnalysis, fetchedSubreddits, structuredComments], timestamp: Date.now() });
+
+        console.log(`Full pipeline for: ${cacheKey} | Response time: ${Date.now() - startTime}ms`);
 
         return NextResponse.json(result, { status: 200 });
 

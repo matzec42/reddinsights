@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CardProps } from '../../types/card-component-types.ts/card-component-type';
+import { CardProps } from '../../types/card-component-types/card-component-type';
 import { PieChart, Pie, Cell, Tooltip, Legend } from 'recharts';
 
 const COLORS = ['#41cb5b', '#fd4c0b', '#979a9c',];

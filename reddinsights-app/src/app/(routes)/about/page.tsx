@@ -14,7 +14,7 @@ const AboutPage: React.FunctionComponent = () => {
                         <h2 className="text-xl font-semibold mb-3">The Project</h2>
                         <p className="text-gray-700 leading-relaxed">
                             Reddinsights is an AI-powered sentiment analysis tool that surfaces insights from Reddit discussions. 
-                            Enter a topic or subreddit, choose an analysis mode (General, Brand, or Student) and Reddinsights 
+                            Enter a topic or subreddit, choose an analysis mode (General, Brand, Trending or Student) and Reddinsights 
                             fetches relevant Reddit posts and runs them through a multi-step LLM pipeline to return a structured 
                             sentiment breakdown, key themes, and representative quotes.
                         </p>
@@ -24,7 +24,7 @@ const AboutPage: React.FunctionComponent = () => {
                         <h2 className="text-xl font-semibold mb-3">The Developer</h2>
                         <p className="text-gray-700 leading-relaxed">
                             Hello! My name is Chris and I&apos;m an engineer with a background in JavaScript and TypeScript, full-stack web development, 
-                            and applied AI. Graduate of Codesmith. Co-creator of CacheIQL, an open source pair of libraries providing 
+                            and applied AI. Graduate of Codesmith and co-creator of CacheIQL, an open source pair of libraries providing 
                             server- and client-side caching solutions for GraphQL users. Currently exploring Python, LLM integration, retrieval augmented generation (RAG), 
                             and AI-powered product development.
                         </p>

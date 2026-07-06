@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import DashboardCard from './DashboardCard';
-import { AnalysisType } from '@/types/card-component-types.ts/card-component-type';
+import { AnalysisType } from '@/types/card-component-types/card-component-type';
 
 // variable for pagination
 const CARDS_PER_PAGE = 9;

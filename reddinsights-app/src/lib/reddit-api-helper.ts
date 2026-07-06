@@ -56,6 +56,19 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
     // initializing the array to collect most relevant posts and ranked comments (including both for more stable/reliable context for LLM)
     // function populates and returns this @ end
     const allReplies: Array<string> = [];
+    
+    // array to hold structured comments for frontend display (see CommentsList.tsx)
+    // ensures consistency for rendering CommentsList below the Card, SavedCard components (parsing w/ regex is too fragile/prone to bugs, as with the permalink URL formatting from Reddit API)
+    const structuredComments: Array<{
+        subreddit: string;
+        post: string;
+        created: string;
+        score: number;
+        relevance: number;
+        comment: string;
+        permalink: string;
+    }> = [];
+
 
     for (const sub of fetchedSubreddits) {
         try {
@@ -96,6 +109,7 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
                     // filtering comments --- score
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     const comments = await (post.expandReplies({ depth: 1, limit: MAX_COMMENTS_PER_POST }) as any);
+
                     const topComments = comments.comments
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         .filter((comment: any) => comment.body && comment.body.trim() !== "")
@@ -116,6 +130,7 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
                         // sanitizing sub as well
                         const cleanSub = normalizeText(sub);
 
+                        // push string-formatted comments to LLM for analysis
                         allReplies.push(`
                                 SUBREDDIT: r/${cleanSub}
                                 \nPOST: ${normalizeText(post.title)}
@@ -123,7 +138,21 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
                                 \nRELEVANCE: ${comm.relevanceScore}
                                 \nCOMMENT: ${comm.body}
                             `);
+                        
+                        // push structured comment objects to array for frontend display (CommentsList.tsx)
+                        structuredComments.push({
+                            subreddit: cleanSub,
+                            post: normalizeText(post.title),
+                            created: new Date(comm.created_utc * 1000).toLocaleString(),
+                            score: comm.score,
+                            relevance: comm.relevanceScore,
+                            comment: comm.body,
+                            permalink: `https://www.reddit.com${comm.permalink}`,
+                        });
                     }
+
+                    // console.log(`Top Comments array in Reddit helper: ${topComments}`);
+
                 } catch (err) {
                     console.warn(`Could not expand comments for post ${post.id}:`, err instanceof Error ? err.message : err);
                 }
@@ -140,5 +169,14 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
         }
     }
 
-    return allReplies
+    return { allReplies, structuredComments };
 };
+
+
+// √ Upvote threshold --- filter out comments below a minimum score to improve quality
+// √ Keyword relevance scoring to prioritize comments that contain the search query terms
+// √ Expose fetched comments to the user on the frontend so they can see quality and refine their search (see generate-analysis/route.ts, data is sent w/ response to frontend now)
+
+// **FUTURE WORK:** explore various options for how to query Reddit API ---  Snoowrap functions (getTop w/ a time option) to fetch Top or Hot comments for threads
+// For now, getTop({ time: "day" }) yields a "real-time" signal, but consider experimenting with others later (see notes in try/catch above)
+// Continue to monitor LLM models --- llama-instant was decomissioned in June 2026, had to modify (see analysisConfigs.ts file)
