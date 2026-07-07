@@ -20,12 +20,12 @@ export async function GET(request: NextRequest) {
             }, { status: 401 });
         }
 
-        // fetch analyses from MongoDB --- all analyses documents associated w/ user
         const analyses = await Analysis.find(
             { userId: session.userId },
-            { analysisTitle: 1, sentimentSummary: 1, createdAt: 1, commentCount: 1 },
-            { sort: { createdAt: -1 }, limit: 20 }
-        );
+            { analysisTitle: 1, sentimentSummary: 1, createdAt: 1, commentCount: 1 }
+        )
+        .sort({ createdAt: -1 })
+        .limit(20);
 
         if (!analyses) {
             console.error("Error fetching analyses from DB");

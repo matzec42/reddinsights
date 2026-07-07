@@ -41,8 +41,8 @@ async function getRedditClient() {
 // redditRequest.config({ proxies: false });
 
 // variables for post & comment extraction, filtering, sorting --- fine tune these depending on comment quality
-const TOP_POSTS = 7;
-const MAX_COMMENTS_PER_POST = 10;
+const TOP_POSTS = 6;
+const MAX_COMMENTS_PER_POST = 9;
 const MIN_SCORE = 3;
 
 

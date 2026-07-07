@@ -57,8 +57,8 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
         },
 
         systemPrompt: "Return ONLY valid JSON. No markdown. No backticks.",
-        modelSubreddit: "llama-3.3-70b-versatile", 
-        modelAnalysis: "meta-llama/llama-4-scout-17b-16e-instruct", 
+        modelSubreddit: "llama-3.1-8b-instant", 
+        modelAnalysis: "openai/gpt-oss-120b", /* "meta-llama/llama-4-scout-17b-16e-instruct", */
         temperature: 0.3,
         maxComments: 30,
         },
@@ -107,8 +107,8 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
         },
 
     systemPrompt: "Return ONLY valid JSON. No markdown. No backticks.",
-    modelSubreddit: "llama-3.3-70b-versatile", 
-    modelAnalysis: "meta-llama/llama-4-scout-17b-16e-instruct", 
+    modelSubreddit: "llama-3.1-8b-instant", 
+    modelAnalysis: "openai/gpt-oss-120b", /* "meta-llama/llama-4-scout-17b-16e-instruct", */
     temperature: 0.3,
     maxComments: 30,
     },
@@ -157,8 +157,8 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
         },
 
     systemPrompt: "Return ONLY valid JSON. No markdown. No backticks.",
-    modelSubreddit: "llama-3.3-70b-versatile", 
-    modelAnalysis: "meta-llama/llama-4-scout-17b-16e-instruct",
+    modelSubreddit: "llama-3.1-8b-instant", 
+    modelAnalysis: "openai/gpt-oss-120b", /* "meta-llama/llama-4-scout-17b-16e-instruct", */
     temperature: 0.3,
     maxComments: 30,
     },
@@ -202,8 +202,8 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
         `;
         },
     systemPrompt: "Return ONLY valid JSON. No markdown. No backticks.",
-    modelSubreddit: "llama-3.3-70b-versatile",
-    modelAnalysis: "meta-llama/llama-4-scout-17b-16e-instruct",
+    modelSubreddit: "llama-3.1-8b-instant", 
+    modelAnalysis: "openai/gpt-oss-120b", /* "meta-llama/llama-4-scout-17b-16e-instruct", */
     temperature: 0.4,
     maxComments: 30,
     }

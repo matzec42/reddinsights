@@ -105,9 +105,6 @@ const AnalyzerPage: React.FunctionComponent = () => {
                                 When viewing Reddit comments, the <b>score</b> figure corresponds to <b>how popular</b> it was based on <b>Reddit user upvotes</b>.
                             </li>
                             <li>
-                                The <b>relevance</b> figure indicates how related a Reddit comment is to the keywords from the search terms.
-                            </li>
-                            <li>
                                 <b>NOTE:</b> Reddit can be a noisy place...so if a search doesn&apos;t return an analysis, experiment with <b>different terms</b> or one of the <b>other search modes</b>.
                             </li>
                         </ul>
