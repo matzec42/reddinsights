@@ -22,7 +22,7 @@ Or create your own account.
 
 ![Search flow](./reddinsights-app/assets/enter-search.gif)
 
-- Reddinsights uses AI to discover relevant subreddits, retrieve and rank comments from active posts in these subreddits (based on Reddit user upvotes, keyword relevance)
+- Reddinsights discovers relevant subreddits, retrieves and ranks comments from active posts in these subreddits (based on Reddit user upvotes, keyword relevance)
 - Reddinsights performs an LLM-powered  analysis utilizing this data, presenting things like a general summary, top discussion themes with supporting comments, visualization of Reddit user sentiment, and links to the subreddits---all in an easy-to-read card display:
 
 ![Card creation](./reddinsights-app/assets/analysis-card.gif)
