@@ -32,7 +32,7 @@ const CommentsList: React.FunctionComponent<CommentsListProps> = ({ comments }) 
                             Created on Reddit: {c.created}
                         </p>
                         <p className="text-xs text-gray-400 mt-1 mb-2">
-                            Score: {c.score} &middot; Keyword Relevance: {c.relevance}
+                            &middot; Reddit Score: {c.score} &middot;
                         </p>
                         <p className="text-gray-700 mb-2 font-medium">{c.comment}</p>
                         <Link

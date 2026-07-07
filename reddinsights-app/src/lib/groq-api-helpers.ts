@@ -11,7 +11,7 @@ export async function groqCall({
         prompt,
         model = "meta-llama/llama-4-scout-17b-16e-instruct", /* "llama-3.3-70b-versatile", */
         temperature = 0.2,
-        maxTokens = 1750,
+        maxTokens = 2000,
         topP = 1,
         stream = false,
         stop = null,
