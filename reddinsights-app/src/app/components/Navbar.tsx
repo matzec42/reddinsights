@@ -36,7 +36,8 @@ const Navbar: React.FunctionComponent = () => {
                 <button
                     className="cursor-pointer mr-5"
                     onClick={async () => {
-                        await fetch('/api/auth/logout', { method: 'POST' })
+                        const res = await fetch('/api/auth/logout', { method: 'POST' })
+                        if (!res.ok) console.error('Logout failed', res.status)
                         window.location.href = '/'
                     }}
                 >
