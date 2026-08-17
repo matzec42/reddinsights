@@ -17,11 +17,18 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
     /* General Analysis Config */
     general: {
         subredditPrompt: (query) => `
-            Find 5 public Reddit communities that are most likely to have detailed, first-hand user discussions about ${query}. Prioritize communities where:
+            Find 5 public Reddit communities that are most likely to have detailed, first-hand user discussions about ${query}.
+            Prioritize communities where:
                 - Most posts are user-generated (not news or memes).
                 - Posts focus on user opinions, experiences and sentiments.
-                - The community is active (recent posts within the last month).
-            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid off-topic or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"]
+                - The community is likely to have active discussion about this topic.
+            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included.
+            Only output the subreddit names as a JSON array of strings.
+            Do not include the "r/" prefix.
+            Do not return private or banned subreddits, only publicly available ones.
+            Avoid off-topic or unrelated subreddits.
+            Return up to 5 relevant communities.
+            EXAMPLE: if query is "Nordstrom", output should be like this: ["Nordstrom", "Nordstrom1901", "Fashion", "Shopping"]
         `,
 
         analysisPrompt:(query, data) => {
@@ -52,13 +59,13 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
                     ]
                 }
                 
-            Quotes for topThemes should be first-hand user experiences or opinions, not jokes, memes, or meta-commentary.
+            Quotes for topThemes should be first-hand user experiences or opinions, not jokes, memes, or meta-commentary. There should be a maximum of 5 top themes.
         `;
         },
 
         systemPrompt: "Return ONLY valid JSON. No markdown. No backticks.",
-        modelSubreddit: "llama-3.1-8b-instant", 
-        modelAnalysis: "openai/gpt-oss-120b", /* "meta-llama/llama-4-scout-17b-16e-instruct", */
+        modelSubreddit: "openai/gpt-oss-20b", 
+        modelAnalysis: "openai/gpt-oss-120b",
         temperature: 0.3,
         maxComments: 30,
         },
@@ -69,9 +76,14 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             Find 5 public Reddit communities that focus on brand perception in user discussions about "${query}". Prioritize communities where:
                 - Most posts are user-generated (not news or memes).
                 - Posts focus mostly on customer reviews, product reviews, complaints, comparisons.
-                - The community is active (recent posts within the last month).
-            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"].
-            Return ONLY JSON array.
+                - The community is likely to have active discussion about this topic.
+            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included.
+            Only output the subreddit names as a JSON array of strings.
+            Do not include the "r/" prefix.
+            Do not return private or banned subreddits, only publicly available ones.
+            Avoid off-topic or unrelated subreddits.
+            Return up to 5 relevant communities.
+            EXAMPLE: if query is "Nordstrom", output should be like this: ["Nordstrom", "Nordstrom1901", "Fashion", "Shopping"]
         `,
 
         analysisPrompt: (query, data) => {
@@ -102,13 +114,13 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
                     ]
                 }
             
-            Quotes for topThemes should be first-hand user experiences or opinions, not jokes, memes, or meta-commentary.
+            Quotes for topThemes should be first-hand user experiences or opinions, not jokes, memes, or meta-commentary. There should be a maximum of 5 top themes.
         `;
         },
 
     systemPrompt: "Return ONLY valid JSON. No markdown. No backticks.",
-    modelSubreddit: "llama-3.1-8b-instant", 
-    modelAnalysis: "openai/gpt-oss-120b", /* "meta-llama/llama-4-scout-17b-16e-instruct", */
+    modelSubreddit: "openai/gpt-oss-20b", 
+    modelAnalysis: "openai/gpt-oss-120b",
     temperature: 0.3,
     maxComments: 30,
     },
@@ -120,9 +132,14 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             Find 5 public Reddit communities that focus on "hot"/currently trending discussions about "${query}". Prioritize subreddits where:
                 - Most posts are user-generated (not news or memes).
                 - Posts focus mostly on customer reviews, product reviews, complaints, comparisons.
-                - The community is active (recent posts within the last month).
-            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"].
-            Return ONLY JSON array.
+                - The community is likely to have active discussion about this topic.
+            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included.
+            Only output the subreddit names as a JSON array of strings.
+            Do not include the "r/" prefix.
+            Do not return private or banned subreddits, only publicly available ones.
+            Avoid off-topic or unrelated subreddits.
+            Return up to 5 relevant communities.
+            EXAMPLE: if query is "Nordstrom", output should be like this: ["Nordstrom", "Nordstrom1901", "Fashion", "Shopping"]
         `,
 
         analysisPrompt: (query, data) => {
@@ -152,13 +169,13 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
                     ]
                 }
             
-            Quotes for topThemes should be first-hand user experiences or opinions, not jokes, memes, or meta-commentary.
+            Quotes for topThemes should be first-hand user experiences or opinions, not jokes, memes, or meta-commentary. There should be a maximum of 5 top themes.
         `;
         },
 
     systemPrompt: "Return ONLY valid JSON. No markdown. No backticks.",
-    modelSubreddit: "llama-3.1-8b-instant", 
-    modelAnalysis: "openai/gpt-oss-120b", /* "meta-llama/llama-4-scout-17b-16e-instruct", */
+    modelSubreddit: "openai/gpt-oss-20b", 
+    modelAnalysis: "openai/gpt-oss-120b",
     temperature: 0.3,
     maxComments: 30,
     },
@@ -169,9 +186,14 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
             Find 5 public Reddit communities where students have discussions about "${query}". Prioritize communities where:
                 - Most posts are user-generated (not news or memes).
                 - Posts focus mostly on customer reviews, product reviews, complaints, comparisons.
-                - The community is active (recent posts within the last month).
-            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included. Only output the subreddit names as a JSON array of strings. Do not include the "r/" prefix. Do not return private or banned subreddits, only publicly available ones. Avoid off-topic, or unrelated subreddits. If unsure, return an empty JSON array. Example output: ["AskReddit", "technology", "McDonalds"].
-            Return ONLY JSON array.
+                - The community is likely to have active discussion about this topic.
+            If query is the name of an existing subreddit (e.g., Amazon, Nordstrom1901), make sure it is included.
+            Only output the subreddit names as a JSON array of strings.
+            Do not include the "r/" prefix.
+            Do not return private or banned subreddits, only publicly available ones.
+            Avoid off-topic or unrelated subreddits.
+            Return up to 5 relevant communities.
+            EXAMPLE: if query is "Nordstrom", output should be like this: ["Nordstrom", "Nordstrom1901", "Fashion", "Shopping"]
         `,
 
         analysisPrompt: (query, data) => {
@@ -199,11 +221,13 @@ export const analysisConfigs: Record<string, AnalysisConfig> = {
                         { theme: string, quote: string }
                     ]
                 }
+
+            Quotes for topThemes should be first-hand user experiences or opinions, not jokes, memes, or meta-commentary. There should be a maximum of 5 top themes.
         `;
         },
     systemPrompt: "Return ONLY valid JSON. No markdown. No backticks.",
-    modelSubreddit: "llama-3.1-8b-instant", 
-    modelAnalysis: "openai/gpt-oss-120b", /* "meta-llama/llama-4-scout-17b-16e-instruct", */
+    modelSubreddit: "openai/gpt-oss-20b", 
+    modelAnalysis: "openai/gpt-oss-120b",
     temperature: 0.4,
     maxComments: 30,
     }

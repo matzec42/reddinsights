@@ -152,7 +152,8 @@ export const getRedditReplies = async (fetchedSubreddits: string[], cleanQuery: 
                     }
 
                 } catch (err) {
-                    console.warn(`Could not expand comments for post ${post.id}:`, err instanceof Error ? err.message : err);
+                    console.warn(`Could not expand comments for post ${post.id} (${post.constructor?.name}):`,
+                        err instanceof Error ? err.message : err);
                 }
             }
 

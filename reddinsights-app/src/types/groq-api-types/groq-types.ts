@@ -8,5 +8,7 @@ export interface GroqApiCallOptions {
     stream?: boolean;
     stop?: string | string[] | null;
     systemPrompt?: string;
+    reasoningEffort?: "low" | "medium" | "high";
+    includeReasoning?: boolean;
 }
 
