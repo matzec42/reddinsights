@@ -96,6 +96,8 @@ export async function POST(request: Request) {
             prompt: config.subredditPrompt(cleanQuery),
             model: config.modelSubreddit,
             temperature: config.temperature,
+            reasoningEffort: "low",
+            includeReasoning: false,
             systemPrompt: "You are a helpful assistant that returns only JSON arrays of subreddit names, no explanations, and no other output."
         });
         // type safety --- parse the fetched Listing of subreddit titles

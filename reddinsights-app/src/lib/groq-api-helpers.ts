@@ -9,13 +9,15 @@ const groq = new Groq(
 // function to query Groq chat
 export async function groqCall({
         prompt,
-        model = "meta-llama/llama-4-scout-17b-16e-instruct", /* "llama-3.3-70b-versatile", */
+        model = "openai/gpt-oss-120b",
         temperature = 0.2,
         maxTokens = 2000,
         topP = 1,
         stream = false,
         stop = null,
-        systemPrompt = "You are a sentiment analyst."
+        systemPrompt = "You are a sentiment analyst.",
+        reasoningEffort,
+        includeReasoning,
     }: GroqApiCallOptions): Promise<string> {
 
     const response = await groq.chat.completions.create({
@@ -33,6 +35,8 @@ export async function groqCall({
         temperature,
         max_completion_tokens: maxTokens,
         top_p: topP,
+        reasoning_effort: reasoningEffort,
+        include_reasoning: includeReasoning,
     })
 
     const groqContent = response.choices[0]?.message?.content?.trim();
